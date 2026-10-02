@@ -28,30 +28,39 @@ public class Empleado  extends  Usuario{
 
 	 @Override
 	    public void verMenu() {
-	        String[] opciones = {
-	            "Registrar venta",
-	            "Ver stock de productos",
-	            "Bajo stock",
-	            "Salir" };
-	        
-	        
+	        String[] opciones = { "Seccion ventas",  "Ver  productos",  "Bajo stock",  "Salir" };
 	        
 	        int seleccion;
 			do { 
-	        	 seleccion = JOptionPane.showOptionDialog( null,  "Menú Administrador - Elija una opción",  "BiancaTex",  JOptionPane.DEFAULT_OPTION,JOptionPane.PLAIN_MESSAGE,
-		                null, opciones, opciones[0]);
+				 seleccion = JOptionPane.showOptionDialog(null,  "Usuario: " + this.getNombre() + "\n  \n\n  Menú Empleado - Elija una opción",
+			                "BiancaTex", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
+	        	
 	        	
 	        switch (seleccion) {
-         case 0: registrarVenta(); break;
-         case 1: VerStockProductos(); break;
-         case 2: verBajoStock(); break;}
+         case 0: seccionVentas(); break;
+         case 1: Producto.verProductos(); break;
+         case 2:Producto.verBajoStock(); break;}
 			} while (seleccion!=3);}
 	        
 	       
-	   
-	        public void registrarVenta() {}
-	        public void VerStockProductos() {}
-	        public void verBajoStock() {}
+	 public void seccionVentas() {
+	        String[] opcionesVentas = {"Registrar venta", "Buscar",  "Ver ventas", "Volver"};
+	        int seleccionVentas;
+
+	        do {
+	            seleccionVentas = JOptionPane.showOptionDialog(null, "Seccion ventas - Elija una opción", "Ventas",
+	                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+	                    null, opcionesVentas, opcionesVentas[0]);
+
+	            switch (seleccionVentas) {
+	                case 0: Venta.registrarVenta(this); break;
+	                case 1: Venta.buscarVenta(); break;
+	                case 2: Venta.verVentas(); break;
+	            }
+
+	        } while (seleccionVentas != 3 && seleccionVentas != -1); }
+	    	
+	        
 	
 	
 }

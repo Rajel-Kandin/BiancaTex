@@ -18,8 +18,9 @@ public class Contador extends Usuario {
         
         int seleccion;
 		do { 
-        	 seleccion = JOptionPane.showOptionDialog( null,  "Menú Contador - Elija una opción",  "BiancaTex",  JOptionPane.DEFAULT_OPTION,JOptionPane.PLAIN_MESSAGE,
-	                null, opciones, opciones[0]);
+			  seleccion = JOptionPane.showOptionDialog(null,   "Usuario: " + this.getNombre() + " \n\n Menú Contador - Elija una opción",
+		                "BiancaTex", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,  null, opciones, opciones[0]);
+
         	
         switch (seleccion) {
         case 0: verCuentaCorriente(); break;}	
