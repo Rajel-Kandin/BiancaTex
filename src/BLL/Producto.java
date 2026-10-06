@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import javax.swing.JOptionPane;
 
 import DDL.ControllerProducto;
+import repository.Validaciones;
 
 public class Producto {
 
@@ -115,36 +116,31 @@ public class Producto {
 	
 	
 	// crear producto
-	// crear producto
 	public static void crearProducto() {
-	    String nombre = JOptionPane.showInputDialog("Nombre del producto:");
+	    String nombre = Validaciones.validarLetras("Nombre del producto:");
 	    if (nombre == null) return;
-	    String precioTexto = JOptionPane.showInputDialog("Precio:");
-	    if (precioTexto == null) return;
-	    String stockTexto = JOptionPane.showInputDialog("Stock inicial:");
+	    Double precio = Validaciones.validarDouble("Precio:");
+	    if (precio == null) return;
+	    String stockTexto = Validaciones.validarNumeros("Stock inicial:");
 	    if (stockTexto == null) return;
-	    String talle = JOptionPane.showInputDialog("Talle:");
+	    if (stockTexto.length() > 9) {
+	        JOptionPane.showMessageDialog(null, "El stock es demasiado grande."); return; }
+	    int stock = Integer.parseInt(stockTexto);
+	    String talle = Validaciones.validarLetras("Talle:");
 	    if (talle == null) return;
 	    CategoriasProd categoria = CategoriasProd.ElegirCategoria();
 	    if (categoria == null) return;
 
-	    try {
-	        double precio = Double.parseDouble(precioTexto);
-	        int stock = Integer.parseInt(stockTexto);
-
-	        boolean creado = ControllerProducto.crearProducto(nombre, precio, stock, categoria, talle);
-	        if (creado) {
-	            JOptionPane.showMessageDialog(null, "Producto creado correctamente");
-	        }
-	    } catch (NumberFormatException e) {
-	        JOptionPane.showMessageDialog(null, "El precio o el stock no son números válidos");
+	    boolean creado = ControllerProducto.crearProducto(nombre, precio, stock, categoria, talle);
+	    if (creado) {
+	        JOptionPane.showMessageDialog(null, "Producto creado correctamente");
 	    }
 	}
 
 
 	// buscar producto
 	public static void buscarProductos() {
-	    String id = JOptionPane.showInputDialog("Código del producto a buscar:");
+	    String id = Validaciones.validarNumeros("Código del producto a buscar:");
 	    if (id == null) return;
 
 	    Producto p = ControllerProducto.buscarProductoPorId(id);
@@ -164,7 +160,7 @@ public class Producto {
 
 	// editar producto
 	public static void editarProducto() {
-	    String id = JOptionPane.showInputDialog("Código del producto a editar:");
+	    String id = Validaciones.validarNumeros("Código del producto a editar:");
 	    if (id == null) return;
 
 	    Producto p = ControllerProducto.buscarProductoPorId(id);
@@ -173,34 +169,31 @@ public class Producto {
 	        return;
 	    }
 
-	    String nuevoNombre = JOptionPane.showInputDialog("Nombre del producto:", p.getNombre());
+	    String nuevoNombre = Validaciones.validarLetras("Nombre del producto:");
 	    if (nuevoNombre == null) return;
-	    String precioTexto = JOptionPane.showInputDialog("Precio:", p.getPrecio());
-	    if (precioTexto == null) return;
-	    String stockTexto = JOptionPane.showInputDialog("Stock:", p.getStockActual());
+	    Double nuevoPrecio = Validaciones.validarDouble("Precio:");
+	    if (nuevoPrecio == null) return;
+	    String stockTexto = Validaciones.validarNumeros("Stock:");
 	    if (stockTexto == null) return;
-	    String nuevoTalle = JOptionPane.showInputDialog("Talle:", p.getTalle());
+	    if (stockTexto.length() > 9) {
+	        JOptionPane.showMessageDialog(null, "El stock es demasiado grande.");
+	        return; }
+	    int nuevoStock = Integer.parseInt(stockTexto);
+	    String nuevoTalle = Validaciones.validarLetras("Talle:");
 	    if (nuevoTalle == null) return;
 	    CategoriasProd nuevaCategoria = CategoriasProd.ElegirCategoria();
 	    if (nuevaCategoria == null) return;
 
-	    try {
-	        double nuevoPrecio = Double.parseDouble(precioTexto);
-	        int nuevoStock = Integer.parseInt(stockTexto);
-
-	        boolean editado = ControllerProducto.editarProducto(id, nuevoNombre, nuevoPrecio, nuevoStock, nuevaCategoria, nuevoTalle);
-	        if (editado) {
-	            JOptionPane.showMessageDialog(null, "Producto editado correctamente");
-	        }
-	    } catch (NumberFormatException e) {
-	        JOptionPane.showMessageDialog(null, "El precio o el stock no son números válidos");
+	    boolean editado = ControllerProducto.editarProducto(id, nuevoNombre, nuevoPrecio, nuevoStock, nuevaCategoria, nuevoTalle);
+	    if (editado) {
+	        JOptionPane.showMessageDialog(null, "Producto editado correctamente");
 	    }
 	}
 
 
 	// eliminar producto
 	public static void eliminarProducto() {
-	    String id = JOptionPane.showInputDialog("Código del producto a eliminar:");
+	    String id = Validaciones.validarNumeros("Código del producto a eliminar:");
 	    if (id == null) return;
 
 	    Producto p = ControllerProducto.buscarProductoPorId(id);
@@ -244,9 +237,7 @@ public class Producto {
 	}
 
 
-	public void stockSuficiente() {}
-	public void sumarStock() {}
-	public void descontarStock(){}
+
 	
 
 	

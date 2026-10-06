@@ -16,17 +16,8 @@ public class Admin extends Usuario {
 	    @Override
 	    public void verMenu() {
 	        String[] opciones = {
-	            "Gestionar usuarios",
-	            "Gestionar productos",
-	            "Gestionar proveedores",
-	            "Gestionar locales",
-	            "Seccion compras",
-	            "Seccion ventas",
-	            "Cuenta corriente",
-	            "Bajo stock",
-	           
-	            "Salir" };
-	        
+	            "Gestionar usuarios", "Gestionar productos", "Gestionar proveedores",  "Gestionar locales", "Seccion compras", "Seccion ventas", "Cuenta corriente",
+	            "Bajo stock", "Salir" };
 	        
 	        
 	        int seleccion;
@@ -40,9 +31,8 @@ public class Admin extends Usuario {
             case 3: gestionarLocales();break;
             case 4: seccionCompras(); break;
             case 5: seccionVentas(); break;
-            case 6: verCuentaCorriente(); break;
-            case 7: Producto.verBajoStock(); break;
-           }	
+            case 6: seccionCuentaCorriente(); break;
+            case 7: Producto.verBajoStock(); break; }	
 			} while (seleccion!=8);}
 	        
 	    
@@ -159,10 +149,25 @@ public class Admin extends Usuario {
 		        } while (seleccionVentas != 4 && seleccionVentas != -1); }
 		    	
 		    
-	
-	     
-	        public void verCuentaCorriente() {}
+		    
+			public void seccionCuentaCorriente() {
+			    String[] opciones = {"Ver", "Cargar saldo inicial", "Crear ingreso", "Crear egreso", "Eliminar ingreso/egreso", "Volver"};
+			    int elegido;
+
+			    do {
+			        elegido = JOptionPane.showOptionDialog(null, "Cuenta corriente", "Cuenta corriente",
+			                0, 0, null, opciones, opciones[0]);
+
+			        switch (elegido) {
+			            case 0: CuentaCorriente.verCuentaCorriente();break;
+			            case 1: CuentaCorriente.cargarSaldoInicial(this);  break;
+			            case 2: CuentaCorriente.crearIngreso(this); break;
+			            case 3:  CuentaCorriente.crearEgreso(this); break;
+			            case 4: CuentaCorriente.eliminarMovimientoManual();break;
+			        }
+			    } while (elegido != 5 && elegido != JOptionPane.CLOSED_OPTION);}
 	   
+			
 	        
 	        
 	    }

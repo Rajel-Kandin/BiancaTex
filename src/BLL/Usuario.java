@@ -5,6 +5,7 @@ import javax.swing.JOptionPane;
 
 import DDL.ControllerLocal;
 import DDL.ControllerUsuario;
+import repository.Validaciones;
 
 public abstract class Usuario implements Menu{
 
@@ -139,9 +140,10 @@ public abstract class Usuario implements Menu{
 
 	
 		public void crearUsuario() {
-	        String dni = JOptionPane.showInputDialog("DNI del nuevo usuario:");
-	        if (dni == null) return;
-	        String nombre = JOptionPane.showInputDialog("Nombre y apellido:");
+	        Integer dniNum = Validaciones.validarEntero("DNI del nuevo usuario:");
+	        if (dniNum == null) return;
+	        String dni = String.valueOf(dniNum);
+	        String nombre = Validaciones.validarLetras("Nombre y apellido:");
 	        if (nombre == null) return;
 	        String email;
 	        do { email = JOptionPane.showInputDialog("Email:");
@@ -195,8 +197,9 @@ public abstract class Usuario implements Menu{
 	    
 	 // buscar usuario
 	    public void buscarUsuario() {
-	        String dni = JOptionPane.showInputDialog("DNI del usuario a buscar:");
-	        if (dni == null) return;
+	        Integer dniNum = Validaciones.validarEntero("DNI del usuario a buscar:");
+	        if (dniNum == null) return;
+	        String dni = String.valueOf(dniNum);
 
 	        Usuario u = ControllerUsuario.buscarUsuarioPorDni(dni);
 	        if (u == null) {
@@ -215,8 +218,9 @@ public abstract class Usuario implements Menu{
 	    
 	    //editar usuario
 	    public void editarUsuario() {
-	        String dni = JOptionPane.showInputDialog("DNI del usuario a editar:");
-	        if (dni == null) return;
+	        Integer dniNum = Validaciones.validarEntero("DNI del usuario a editar:");
+	        if (dniNum == null) return;
+	        String dni = String.valueOf(dniNum);
 
 	        Usuario u = ControllerUsuario.buscarUsuarioPorDni(dni);
 	        if (u == null) {
@@ -225,7 +229,7 @@ public abstract class Usuario implements Menu{
 	        }
 
 	        int idUsuario = u.getIdUsuario();
-	        String nuevoNombre = JOptionPane.showInputDialog("Nombre y apellido:", u.getNombre());
+	        String nuevoNombre = Validaciones.validarLetras("Nombre y apellido:");
 	        if (nuevoNombre == null) return;
 
 	        String nuevoEmail;
@@ -264,8 +268,9 @@ public abstract class Usuario implements Menu{
 	    
 	    //elimina // desactiva usuario
 	    public void desactivarUsuario() {
-	        String dni = JOptionPane.showInputDialog("DNI del usuario a desactivar:");
-	        if (dni == null) return;
+	        Integer dniNum = Validaciones.validarEntero("DNI del usuario a desactivar:");
+	        if (dniNum == null) return;
+	        String dni = String.valueOf(dniNum);
 
 	        Usuario u = ControllerUsuario.buscarUsuarioPorDni(dni);
 	        if (u == null) {

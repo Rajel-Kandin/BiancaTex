@@ -8,8 +8,8 @@ public class Ingreso  extends Manual{
 		super(idMovimiento, fecha, monto, descripcion);
 	}
 
+	
+	
 	public  String VerInfo() {
-		return null;}
-	
-	
+		return "Ingreso #" + getIdMovimiento() + " | " + getFecha() + " | " + getDescripcion() + " | +$" + getMonto();}
 }

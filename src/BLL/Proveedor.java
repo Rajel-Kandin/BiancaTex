@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import javax.swing.JOptionPane;
 
 import DDL.ControllerProveedor;
+import repository.Validaciones;
 
 public class Proveedor {
 
@@ -80,13 +81,13 @@ public class Proveedor {
 
 	// crear proveedor
 	public static void crearProveedor() {
-	    String cuit = JOptionPane.showInputDialog("CUIT del nuevo proveedor:");
+	    String cuit = Validaciones.validarNumeros("CUIT del nuevo proveedor:");
 	    if (cuit == null) return;
-	    String nombre = JOptionPane.showInputDialog("Nombre del proveedor:");
+	    String nombre = Validaciones.validarLetras("Nombre del proveedor:");
 	    if (nombre == null) return;
 	    String direccion = JOptionPane.showInputDialog("Dirección:");
 	    if (direccion == null) return;
-	    String telefono = JOptionPane.showInputDialog("Teléfono:");
+	    String telefono = Validaciones.validarNumeros("Teléfono:");
 	    if (telefono == null) return;
 
 	    boolean creado = ControllerProveedor.crearProveedor(cuit, nombre, direccion, telefono);
@@ -98,7 +99,7 @@ public class Proveedor {
 
 	// buscar proveedor
 	public static void buscarProveedor() {
-	    String cuit = JOptionPane.showInputDialog("CUIT del proveedor a buscar:");
+	    String cuit = Validaciones.validarNumeros("CUIT del proveedor a buscar:");
 	    if (cuit == null) return;
 
 	    Proveedor p = ControllerProveedor.buscarProveedorPorCuit(cuit);
@@ -117,7 +118,7 @@ public class Proveedor {
 
 	// editar proveedor
 	public static void editarProveedor() {
-	    String cuit = JOptionPane.showInputDialog("CUIT del proveedor a editar:");
+	    String cuit = Validaciones.validarNumeros("CUIT del proveedor a editar:");
 	    if (cuit == null) return;
 
 	    Proveedor p = ControllerProveedor.buscarProveedorPorCuit(cuit);
@@ -126,11 +127,11 @@ public class Proveedor {
 	        return;
 	    }
 
-	    String nuevoNombre = JOptionPane.showInputDialog("Nombre del proveedor:", p.getNombre());
+	    String nuevoNombre = Validaciones.validarLetras("Nombre del proveedor:");
 	    if (nuevoNombre == null) return;
 	    String nuevaDireccion = JOptionPane.showInputDialog("Dirección:", p.getDireccion());
 	    if (nuevaDireccion == null) return;
-	    String nuevoTelefono = JOptionPane.showInputDialog("Teléfono:", p.getTelefono());
+	    String nuevoTelefono = Validaciones.validarNumeros("Teléfono:");
 	    if (nuevoTelefono == null) return;
 
 	    boolean editado = ControllerProveedor.editarProveedor(cuit, nuevoNombre, nuevaDireccion, nuevoTelefono);
@@ -142,7 +143,7 @@ public class Proveedor {
 
 	// eliminar proveedor
 	public static void eliminarProveedor() {
-	    String cuit = JOptionPane.showInputDialog("CUIT del proveedor a eliminar:");
+	    String cuit = Validaciones.validarNumeros("CUIT del proveedor a eliminar:");
 	    if (cuit == null) return;
 
 	    Proveedor p = ControllerProveedor.buscarProveedorPorCuit(cuit);

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import javax.swing.JOptionPane;
 
 import DDL.ControllerLocal;
+import repository.Validaciones;
 
 public class Local {
 
@@ -53,11 +54,10 @@ public class Local {
     }
 
     public static void buscarLocal() {
-        String idTexto = JOptionPane.showInputDialog("Ingrese el ID del local a buscar:");
-        if (idTexto == null || idTexto.isEmpty()) {
+        Integer idLocal = Validaciones.validarEntero("Ingrese el ID del local a buscar:");
+        if (idLocal == null) {
             return;
         }
-        int idLocal = Integer.parseInt(idTexto);
         Local local = ControllerLocal.buscarLocalPorId(idLocal);
         if (local != null) {
             String info = "ID: " + local.getIdLocal() + "\n";
@@ -69,11 +69,10 @@ public class Local {
     }
 
     public static void editarLocal() {
-        String idTexto = JOptionPane.showInputDialog("Ingrese el ID del local a editar:");
-        if (idTexto == null || idTexto.isEmpty()) {
+        Integer idLocal = Validaciones.validarEntero("Ingrese el ID del local a editar:");
+        if (idLocal == null) {
             return;
         }
-        int idLocal = Integer.parseInt(idTexto);
         Local local = ControllerLocal.buscarLocalPorId(idLocal);
         if (local == null) {
             JOptionPane.showMessageDialog(null, "No se encontró el local.");
@@ -94,11 +93,10 @@ public class Local {
     }
 
     public static void eliminarLocal() {
-        String idTexto = JOptionPane.showInputDialog("Ingrese el ID del local a eliminar:");
-        if (idTexto == null || idTexto.isEmpty()) {
+        Integer idLocal = Validaciones.validarEntero("Ingrese el ID del local a eliminar:");
+        if (idLocal == null) {
             return;
         }
-        int idLocal = Integer.parseInt(idTexto);
         boolean exito = ControllerLocal.eliminarLocal(idLocal);
         if (exito) {
             JOptionPane.showMessageDialog(null, "Local eliminado correctamente.");

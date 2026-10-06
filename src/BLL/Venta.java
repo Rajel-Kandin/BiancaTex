@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import DDL.ControllerProducto;
 import DDL.ControllerVenta;
+import repository.Validaciones;
 
 public class Venta extends Movimiento {
 
@@ -86,14 +87,13 @@ public class Venta extends Movimiento {
         }
 
         String seleccion = (String) JOptionPane.showInputDialog(
-                null, "Seleccioná el producto:", "Producto",  JOptionPane.QUESTION_MESSAGE,  null, opciones, opciones[0] );
+                null, "Seleccioná el producto:", "Producto", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
 
-        if (seleccion == null) return null; 
+        if (seleccion == null) return null;
 
         int index = Arrays.asList(opciones).indexOf(seleccion);
-        return productos.get(index); }
-
-    
+        return productos.get(index);
+    }
 
     public static void registrarVenta(Usuario usuario) {
         LinkedList<Integer> ids = new LinkedList<Integer>();
@@ -102,12 +102,12 @@ public class Venta extends Movimiento {
         double subtotal = 0;
         boolean agregando = true;
 
-        //  agregar productos
+        // agregar productos
         while (agregando) {
             Producto producto = seleccionarProducto();
 
             if (producto == null) {
-                agregando = false; 
+                agregando = false;
             } else {
                 int idProd = Integer.parseInt(String.valueOf(producto.getIdProducto()));
                 double precio = producto.getPrecio();
@@ -122,9 +122,14 @@ public class Venta extends Movimiento {
                 if (disponible <= 0) {
                     JOptionPane.showMessageDialog(null, "No hay stock disponible de ese producto.");
                 } else {
-                    int cantidad = Validacion.ValidarRangoCancelable("Cantidad (disponible: " + disponible + "):", 1, disponible);
+                    
+                    Integer cantidad = Validaciones.validarEntero("Cantidad (disponible: " + disponible + "):");
+                    while (cantidad != null && cantidad > disponible) {
+                        JOptionPane.showMessageDialog(null, "No hay stock suficiente. Disponible: " + disponible);
+                        cantidad = Validaciones.validarEntero("Cantidad (disponible: " + disponible + "):");
+                    }
 
-                    if (cantidad != -1) { 
+                    if (cantidad != null) {
                         if (pos != -1) {
                             cantidades.set(pos, yaCargado + cantidad);
                         } else {
@@ -133,7 +138,7 @@ public class Venta extends Movimiento {
                             precios.add(precio);
                         }
 
-                        // calcula subtotal 
+                        // calcula subtotal
                         subtotal += precio * cantidad;
 
                         int otro = JOptionPane.showConfirmDialog(null,
@@ -141,13 +146,16 @@ public class Venta extends Movimiento {
                                 "\n\n¿Agregar otro producto?", "Venta", JOptionPane.YES_NO_OPTION);
                         if (otro != JOptionPane.YES_OPTION) {
                             agregando = false;
-                        } } }
-            }  }
+                        }
+                    }
+                }
+            }
+        }
 
         if (ids.isEmpty()) {
             JOptionPane.showMessageDialog(null, "No se agregó ningún producto. Venta cancelada.");
-            return;  }
-        
+            return;
+        }
 
         // pregunta descuento
         double descuento = 0;
@@ -156,13 +164,19 @@ public class Venta extends Movimiento {
                 "Descuento", JOptionPane.YES_NO_OPTION);
 
         if (resp == JOptionPane.YES_OPTION) {
-            int porcentaje = Validacion.ValidarRangoCancelable("Ingrese el porcentaje de descuento (1 a 100):", 1, 100);
-            if (porcentaje == -1) {
+            
+            Double porcentaje = Validaciones.validarDouble("Ingrese el porcentaje de descuento (1 a 100):");
+            while (porcentaje != null && porcentaje > 100) {
+                JOptionPane.showMessageDialog(null, "El descuento no puede ser mayor a 100%.");
+                porcentaje = Validaciones.validarDouble("Ingrese el porcentaje de descuento (1 a 100):");
+            }
+
+            if (porcentaje == null) {
                 JOptionPane.showMessageDialog(null, "Venta cancelada.");
                 return;
             }
-            descuento = porcentaje; }
-        
+            descuento = porcentaje;
+        }
 
         // calcula total final
         double total = subtotal - (subtotal * descuento / 100);
@@ -175,9 +189,9 @@ public class Venta extends Movimiento {
 
         if (confirmar != JOptionPane.YES_OPTION) {
             JOptionPane.showMessageDialog(null, "Venta cancelada.");
-            return;  }
+            return;
+        }
 
-        
         // guarda la venta
         boolean ok = ControllerVenta.guardarVenta(usuario.getIdUsuario(), descuento, subtotal, total, ids, cantidades, precios);
 
@@ -185,16 +199,13 @@ public class Venta extends Movimiento {
             JOptionPane.showMessageDialog(null, "Venta registrada correctamente.");
         } else {
             JOptionPane.showMessageDialog(null, "Error al registrar la venta. No se guardó nada.");
-        }}
-    
-    
-    
+        }
+    }
 
     public static void buscarVenta() {
-        int idVenta = Validacion.ValidarNumCancelable("Ingrese el ID de la venta a buscar:");
-        if (idVenta == -1) {
-            return; 
-        }
+       
+        Integer idVenta = Validaciones.validarEntero("Ingrese el ID de la venta a buscar:");
+        if (idVenta == null) return;
 
         String info = ControllerVenta.obtenerVenta(idVenta);
 
@@ -202,15 +213,13 @@ public class Venta extends Movimiento {
             JOptionPane.showMessageDialog(null, "No existe una venta con ese ID.");
         } else {
             JOptionPane.showMessageDialog(null, info);
-        } }
-    
-    
+        }
+    }
 
     public static void eliminarVenta() {
-        int idVenta = Validacion.ValidarNumCancelable("Ingrese el ID de la venta a eliminar:");
-        if (idVenta == -1) {
-            return;
-        }
+        
+        Integer idVenta = Validaciones.validarEntero("Ingrese el ID de la venta a eliminar:");
+        if (idVenta == null) return;
 
         String info = ControllerVenta.obtenerVenta(idVenta);
 
@@ -228,14 +237,11 @@ public class Venta extends Movimiento {
                 JOptionPane.showMessageDialog(null, "Venta eliminada y stock devuelto.");
             } else {
                 JOptionPane.showMessageDialog(null, "Error al eliminar la venta. No se modificó nada.");
-            }  } }
-    
-    
-    
+            }
+        }
+    }
 
     public static void verVentas() {
-        JOptionPane.showMessageDialog(null, ControllerVenta.listarVentas()); }
-    
-    
-    
+        JOptionPane.showMessageDialog(null, ControllerVenta.listarVentas());
+    }
 }

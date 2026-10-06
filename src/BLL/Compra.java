@@ -1,6 +1,7 @@
 package BLL;
 
 import java.time.LocalDate;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -9,6 +10,8 @@ import javax.swing.JOptionPane;
 import DDL.ControllerCompra;
 import DDL.ControllerProducto;
 import DDL.ControllerProveedor;
+import repository.Validaciones;
+import DDL.ControllerCuentaCorriente;
 
 public class Compra extends Movimiento {
 
@@ -85,20 +88,8 @@ public class Compra extends Movimiento {
 			Producto producto = seleccionarProducto();
 			if (producto == null) return; //
 
-			String cantidadTexto = JOptionPane.showInputDialog("Cantidad de \"" + producto.getNombre() + "\" a comprar:");
-			if (cantidadTexto == null) return;
-
-			int cantidad;
-			try {
-				cantidad = Integer.parseInt(cantidadTexto);
-				if (cantidad <= 0) {
-					JOptionPane.showMessageDialog(null, "La cantidad debe ser mayor a 0");
-					continue;
-				}
-			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(null, "La cantidad no es un número válido");
-				continue;
-			}
+			Integer cantidad = Validaciones.validarEntero("Cantidad de \"" + producto.getNombre() + "\" a comprar:");
+			if (cantidad == null) return;
 
 			// creo y guardo idDetalleCompra e idCompra 
 			detalleTemporal.add(new DetalleCompra(0, cantidad, producto, 0));
@@ -114,16 +105,8 @@ public class Compra extends Movimiento {
 		}
 
 		// ingresa el total
-		String totalTexto = JOptionPane.showInputDialog("Monto total de la compra:");
-		if (totalTexto == null) return;
-
-		Double total;
-		try {
-			total = Double.parseDouble(totalTexto);
-		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "El monto no es un número válido");
-			return;
-		}
+		Double total = Validaciones.validarDouble("Monto total de la compra:");
+		if (total == null) return;
 
 		int confirmacion = JOptionPane.showConfirmDialog(null,
 				"¿Confirmar compra a " + proveedor.getNombre() + " por $" + total + "?",
@@ -150,8 +133,8 @@ public class Compra extends Movimiento {
 			producto.setStockActual(nuevoStock);
 		}
 
-		// TODO RFA11: cuando esté armado CuentaCorriente, generar acá un egreso por "total"
-
+		ControllerCuentaCorriente.registrarMovimiento(fecha, -total, "Compra", usuarioLogueado.getIdUsuario(), idCompra, null);
+		
 		Compra nuevaCompra = new Compra(0, fecha, total, idCompra, total, proveedor, usuarioLogueado);
 		compras.add(nuevaCompra);
 
@@ -216,16 +199,8 @@ public class Compra extends Movimiento {
 
 	// buscar compra
 	public static void buscarCompra() {
-	    String idTexto = JOptionPane.showInputDialog("Número de compra a buscar:");
-	    if (idTexto == null) return;
-
-	    int idCompra;
-	    try {
-	        idCompra = Integer.parseInt(idTexto);
-	    } catch (NumberFormatException e) {
-	        JOptionPane.showMessageDialog(null, "El número de compra no es válido");
-	        return;
-	    }
+	    Integer idCompra = Validaciones.validarEntero("Número de compra a buscar:");
+	    if (idCompra == null) return;
 
 	    String texto = ControllerCompra.obtenerCompraTexto(idCompra);
 	    if (texto.isEmpty()) {
@@ -239,16 +214,8 @@ public class Compra extends Movimiento {
 	
 	// eliminar compra (revierte el stock sumado)
 	public static void eliminarCompra() {
-	    String idTexto = JOptionPane.showInputDialog("Número de compra a eliminar:");
-	    if (idTexto == null) return;
-
-	    int idCompra;
-	    try {
-	        idCompra = Integer.parseInt(idTexto);
-	    } catch (NumberFormatException e) {
-	        JOptionPane.showMessageDialog(null, "El número de compra no es válido");
-	        return;
-	    }
+	    Integer idCompra = Validaciones.validarEntero("Número de compra a eliminar:");
+	    if (idCompra == null) return;
 
 	    if (!ControllerCompra.existeCompra(idCompra)) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ninguna compra con ese número");
@@ -270,8 +237,8 @@ public class Compra extends Movimiento {
 	    ControllerCompra.eliminarDetallesDeCompra(idCompra);
 	    ControllerCompra.eliminarCompra(idCompra);
 
-	    //  cuando esté armado CuentaCorriente, revertir también el egreso asociado
-
+	    ControllerCuentaCorriente.eliminarMovimientoCompra(idCompra);
+	    
 	    Compra aEliminar = null;
 	    for (Compra c : compras) {
 	        if (c.getIdCompra() == idCompra) {

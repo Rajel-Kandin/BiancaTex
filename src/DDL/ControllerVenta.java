@@ -54,6 +54,16 @@ public class ControllerVenta {
                 }
             }
 
+            // CUENTA CORRIENTE: ingreso por el total de la venta (
+            PreparedStatement psCuenta = con.prepareStatement(
+                "INSERT INTO cuentaCorriente (fecha, monto, descripcion, fk_usuario, fk_compra, fk_venta) VALUES (?, ?, ?, ?, NULL, ?)");
+            psCuenta.setDate(1, Date.valueOf(LocalDate.now()));
+            psCuenta.setDouble(2, total);
+            psCuenta.setString(3, "Venta");
+            psCuenta.setInt(4, idUsuario);
+            psCuenta.setInt(5, idVenta);
+            psCuenta.executeUpdate();
+
             con.commit();
             return true;
 
@@ -162,6 +172,11 @@ public class ControllerVenta {
                 psStock.setInt(2, rs.getInt("fk_producto"));
                 psStock.executeUpdate();
             }
+
+            // CUENTA CORRIENTE: borrar el movimiento de esta venta (antes de borrar la venta por la FK)
+            PreparedStatement psDelCuenta = con.prepareStatement("DELETE FROM cuentaCorriente WHERE fk_venta = ?");
+            psDelCuenta.setInt(1, idVenta);
+            psDelCuenta.executeUpdate();
 
             // borrar detalle y venta
             PreparedStatement psDelDet = con.prepareStatement("DELETE FROM detalleVenta WHERE fk_venta = ?");

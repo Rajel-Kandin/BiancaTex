@@ -7,9 +7,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import BLL.Usuario;
-import BLL.Validacion;
 import DDL.ControllerUsuario;
 import repository.Hashing;
+import repository.Validaciones;
 
 public class main {
 
@@ -27,14 +27,21 @@ public class main {
 
             switch (elegidoIngreso) {
                 case 0:
-                    nombreIngresado = Validacion.ValidarTextoCancelable("Ingrese su usuario:");
+                    nombreIngresado = Validaciones.validarLetras("Ingrese su usuario:");
                     if (nombreIngresado == null) {
-                        break; }
+                        break;
+                    }
                     nombreIngresado = nombreIngresado.toLowerCase();
 
-                    String passwordIngresada = Validacion.ValidarTextoCancelable("Ingrese su contraseña:");
+                   
+                    String passwordIngresada = JOptionPane.showInputDialog("Ingrese su contraseña:");
                     if (passwordIngresada == null) {
-                        break; }
+                        break;
+                    }
+                    if (passwordIngresada.trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "La contraseña no puede estar vacía.");
+                        break;
+                    }
 
                     Usuario usuarioLogueado = ControllerUsuario.login(nombreIngresado, passwordIngresada);
                     if (usuarioLogueado != null) {
@@ -64,5 +71,4 @@ public class main {
         imagen = new ImageIcon(recortado);
         return imagen;
     }
-}
-		
+}		

@@ -8,7 +8,7 @@ public class Egreso extends Manual {
 	}
 
 	public  String VerInfo() {
-		return null;}
+		return "Egreso #" + getIdMovimiento() + " | " + getFecha() + " | " + getDescripcion() + " | -$" + getMonto();}
 	
 
 	
