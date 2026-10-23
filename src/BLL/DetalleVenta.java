@@ -6,15 +6,14 @@ public class DetalleVenta {
 	private int cantidad;
 	private Double precioUnitario;
 	private Double subtotal;
-	
-	
+	private Producto producto;
 
-	public DetalleVenta(int idDetalleVenta, int cantidad, Double precioUnitario, Double subtotal) {
-		super();
+	public DetalleVenta(int idDetalleVenta, int cantidad, Double precioUnitario, Double subtotal, Producto producto) {
 		this.idDetalleVenta = idDetalleVenta;
 		this.cantidad = cantidad;
 		this.precioUnitario = precioUnitario;
 		this.subtotal = subtotal;
+		this.producto = producto;
 	}
 
 	public int getIdDetalleVenta() {
@@ -49,13 +48,17 @@ public class DetalleVenta {
 		this.subtotal = subtotal;
 	}
 
-	
-	public String VerInfo() {
-		return "DetalleCompra [idDetalleVenta=" + idDetalleVenta + ", cantidad=" + cantidad + ", precioUnitario="
-				+ precioUnitario + ", subtotal=" + subtotal + "]";
+	public Producto getProducto() {
+		return producto;
 	}
-	
-	
+
+	public void setProducto(Producto producto) {
+		this.producto = producto;
+	}
+
+	public String VerInfo() {
+		return "DetalleVenta [producto=" + producto.getNombre() + ", cantidad=" + cantidad
+				+ ", precioUnitario=" + precioUnitario + ", subtotal=" + subtotal + "]";}
 	
 	
 }

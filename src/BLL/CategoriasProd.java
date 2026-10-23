@@ -13,11 +13,10 @@ public enum CategoriasProd {
 		CategoriasProd opcion = (CategoriasProd)JOptionPane.showInputDialog(null,"Categorias", null,  0, null, CategoriasProd.values(),CategoriasProd.values()[0] );
 			return opcion;
 		}
-	
-	
-	public String VerCategoria() {
-		return " Categoria: " + this.name();
- 
+
+	public static CategoriasProd ElegirCategoria(CategoriasProd actual) {
+		CategoriasProd opcion = (CategoriasProd)JOptionPane.showInputDialog(null,"Categorias", null,  0, null, CategoriasProd.values(), actual);
+		return opcion;
 	}
 	
 }

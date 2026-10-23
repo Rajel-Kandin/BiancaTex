@@ -19,7 +19,8 @@ public class Compra extends Movimiento {
 	private Double total;
 	private Proveedor proveedor;
 	private Usuario usuario;
-	private static LinkedList<Compra> compras = new LinkedList<Compra>();
+	
+	private Byte [] factura;
 
 	public Compra(int idMovimiento, LocalDate fecha, Double monto, int idCompra, Double total, Proveedor proveedor, Usuario usuario) {
 		super(idMovimiento, fecha, monto);
@@ -61,19 +62,21 @@ public class Compra extends Movimiento {
 		this.usuario = usuario;
 	}
 
-	public static LinkedList<Compra> getCompras() {
-		return compras;
+	public Byte[] getFactura() {
+		return factura;
 	}
 
-	public static void setCompras(LinkedList<Compra> compras) {
-		Compra.compras = compras;
+	public void setFactura(Byte[] factura) {
+		this.factura = factura;
 	}
 
 	public String VerInfo() {
 		return "Compra [idCompra=" + idCompra + ", total=" + total + ", proveedor=" + proveedor + ", usuario=" + usuario + "]";
 	}
+	
+	
 
-	// registrar compra
+	// metodo registrar compra
 	public static void registrarCompra(Usuario usuarioLogueado) {
 
 		// seleccionar proveedor 
@@ -115,31 +118,23 @@ public class Compra extends Movimiento {
 
 		LocalDate fecha = LocalDate.now();
 
-		//guardo el id del usuario que regsitro la compra
+		//guarda el id del usuario que regsitro la compra
 		int idCompra = ControllerCompra.crearCompra(fecha, total, proveedor.getCuit(), usuarioLogueado.getIdUsuario());
 		if (idCompra == -1) {
 			JOptionPane.showMessageDialog(null, "Ocurrió un error al registrar la compra");
 			return;
 		}
 
-		// guardo  detalleCompra y suma al stock de cada producto
+		// guarda detalleCompra y suma al stock de cada producto
 		for (DetalleCompra detalle : detalleTemporal) {
 			detalle.setIdCompra(idCompra);
 			ControllerCompra.crearDetalleCompra(detalle.getCantidad(), detalle.getProducto().getIdProducto(), idCompra);
-
-			Producto producto = detalle.getProducto();
-			int nuevoStock = producto.getStockActual() + detalle.getCantidad();
-			ControllerProducto.actualizarStock(producto.getIdProducto(), nuevoStock);
-			producto.setStockActual(nuevoStock);
-		}
+			ControllerProducto.sumarStock(detalle.getProducto().getIdProducto(), detalle.getCantidad());
+		                                              }
 
 		ControllerCuentaCorriente.registrarMovimiento(fecha, -total, "Compra", usuarioLogueado.getIdUsuario(), idCompra, null);
-		
-		Compra nuevaCompra = new Compra(0, fecha, total, idCompra, total, proveedor, usuarioLogueado);
-		compras.add(nuevaCompra);
-
 		JOptionPane.showMessageDialog(null, "Compra registrada correctamente");
-	}
+	            }
 
 	// selecciona un proveedor menu   
 	private static Proveedor seleccionarProveedor() {
@@ -156,20 +151,11 @@ public class Compra extends Movimiento {
 		}
 
 		String seleccion = (String) JOptionPane.showInputDialog(
-				null,
-				"Seleccioná el proveedor:",
-				"Proveedor",
-				JOptionPane.QUESTION_MESSAGE,
-				null,
-				opciones,
-				opciones[0]
-		);
-
+				null,"Seleccioná el proveedor:",	"Proveedor",JOptionPane.QUESTION_MESSAGE, null,opciones,	opciones[0]	);
 		if (seleccion == null) return null;
 
 		int index = Arrays.asList(opciones).indexOf(seleccion);
-		return proveedores.get(index);
-	}
+		return proveedores.get(index);}
 
 	// selecciona un producto de un menu  
 	private static Producto seleccionarProducto() {
@@ -177,23 +163,20 @@ public class Compra extends Movimiento {
 
 		if (productos.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "No hay productos cargados. Se cancela la compra");
-			return null;
-		}
+			return null;}
 
 		String[] opciones = new String[productos.size()];
 		for (int i = 0; i < productos.size(); i++) {
 			opciones[i] = productos.get(i).getNombre() + " (Talle: " + productos.get(i).getTalle()
-					+ " - Stock: " + productos.get(i).getStockActual() + ")";
-		}
+					+ " - Stock: " + productos.get(i).getStockActual() + ")";}
 
 		String seleccion = (String) JOptionPane.showInputDialog(
 				null, "Seleccioná el producto:","Producto",JOptionPane.QUESTION_MESSAGE,null,	opciones,opciones[0]);
 
-		if (seleccion == null) return null; // canceló
+		if (seleccion == null) return null; 
 
 		int index = Arrays.asList(opciones).indexOf(seleccion);
-		return productos.get(index);
-	}
+		return productos.get(index); }
 
 
 
@@ -219,8 +202,7 @@ public class Compra extends Movimiento {
 
 	    if (!ControllerCompra.existeCompra(idCompra)) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ninguna compra con ese número");
-	        return;
-	    }
+	        return; }
 
 	    int confirmacion = JOptionPane.showConfirmDialog(null,
 	            "¿Seguro que querés eliminar la compra #" + idCompra + "? Se revertirá el stock sumado",
@@ -229,28 +211,13 @@ public class Compra extends Movimiento {
 
 	    LinkedList<DetalleCompra> detalle = ControllerCompra.obtenerDetalleCompraObjetos(idCompra);
 	    for (DetalleCompra d : detalle) {
-	        Producto producto = d.getProducto();
-	        int stockRevertido = producto.getStockActual() - d.getCantidad();
-	        ControllerProducto.actualizarStock(producto.getIdProducto(), stockRevertido);
-	    }
-
+	        ControllerProducto.sumarStock(d.getProducto().getIdProducto(), -d.getCantidad());
+	                                   }
+	    
 	    ControllerCompra.eliminarDetallesDeCompra(idCompra);
 	    ControllerCompra.eliminarCompra(idCompra);
-
-	    ControllerCuentaCorriente.eliminarMovimientoCompra(idCompra);
+	    ControllerCuentaCorriente.eliminarMovimientoCompra(idCompra);}
 	    
-	    Compra aEliminar = null;
-	    for (Compra c : compras) {
-	        if (c.getIdCompra() == idCompra) {
-	            aEliminar = c;
-	            break;
-	        }
-	    }
-	    if (aEliminar != null) {
-	        compras.remove(aEliminar);
-	    }
-
-	    JOptionPane.showMessageDialog(null, "Compra eliminada correctamente");}
 
 
 	// ver compras
@@ -258,10 +225,8 @@ public class Compra extends Movimiento {
 	    String lista = ControllerCompra.obtenerListaCompras();
 	    if (lista.isEmpty()) {
 	        JOptionPane.showMessageDialog(null, "No hay compras registradas");
-	        return;
-	    }
-	    JOptionPane.showMessageDialog(null, lista, "Compras", JOptionPane.PLAIN_MESSAGE);
-	}
+	        return; }
+	    JOptionPane.showMessageDialog(null, lista, "Compras", JOptionPane.PLAIN_MESSAGE);}
 
 	
 	

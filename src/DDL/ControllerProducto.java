@@ -12,7 +12,7 @@ import BLL.Producto;
 
 public class ControllerProducto {
 
-    // crea producto (el id lo genera MySQL)
+    // crea producto 
     public static boolean crearProducto(String nombre, double precio, int stock, CategoriasProd categoria, String talle) {
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
@@ -30,12 +30,10 @@ public class ControllerProducto {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
-        }
-    }
+            return false;    } }
 
 
-    // Busca producto por id y devuelve el objeto Producto (o null si no existe)
+    // Busca producto por id
     public static Producto buscarProductoPorId(String idProducto) {
         Producto producto = null;
         try {
@@ -96,34 +94,30 @@ public class ControllerProducto {
     }
 
 
-    // elimina un producto
-    public static boolean eliminarProducto(String idProducto) {
+    // desactiva un producto (borrado lógico): la fila queda en la tabla con activo = 0
+    public static boolean desactivarProducto(String idProducto) {
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "DELETE FROM producto WHERE id_productos = ?"
+                "UPDATE producto SET activo = 0 WHERE id_productos = ? AND activo = 1"
             );
             stmt.setString(1, idProducto);
             int filas = stmt.executeUpdate();
             stmt.close();
             return filas > 0;
 
-        } catch (java.sql.SQLIntegrityConstraintViolationException e) {
-            JOptionPane.showMessageDialog(null, "No se puede eliminar: el producto tiene ventas o compras asociadas");
-            return false;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
-        }
-    }
+            return false;}
+               }
 
 
-    // muestra los productos
+    // muestra los productos activos
     public static String obtenerListaProductos() {
         String lista = "";
 
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "SELECT * FROM producto ORDER BY nombre"
+                "SELECT * FROM producto WHERE activo = 1 ORDER BY nombre"
             );
             ResultSet rs = stmt.executeQuery();
 
@@ -138,19 +132,17 @@ public class ControllerProducto {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return lista;
-    }
-    
-    
- // productos con stock menor a 20
+            e.printStackTrace();}
+        return lista; }
+
+
+    // productos activos con stock menor a 20
     public static String obtenerListaBajoStock() {
         String lista = "";
 
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "SELECT * FROM producto WHERE stock < 20 ORDER BY stock"
+                "SELECT * FROM producto WHERE stock < 20 AND activo = 1 ORDER BY stock"
             );
             ResultSet rs = stmt.executeQuery();
 
@@ -165,7 +157,8 @@ public class ControllerProducto {
             stmt.close();
         } catch (SQLException e) {
             e.printStackTrace(); }
-           return lista; }
+        return lista;
+                                         }
     
     
  // actualiza el stock de producto
@@ -186,7 +179,7 @@ public class ControllerProducto {
             return false;   } }
     
 
- // trae todos los productos como objetos  (para ver en las compras y ventas)
+ // trae todos los productos 
     public static LinkedList<Producto> obtenerProductos() {
         LinkedList<Producto> productos = new LinkedList<Producto>();
         try {
@@ -220,6 +213,21 @@ public class ControllerProducto {
             e.printStackTrace();
         }
         return productos;  }
+    
+    
+ // suma (o resta si la cantidad es negativa) al stock actual de la BD
+    public static boolean sumarStock(String idProducto, int cantidad) {
+        try {
+            PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
+                "UPDATE producto SET stock = stock + ? WHERE id_productos = ?");
+            stmt.setInt(1, cantidad);
+            stmt.setString(2, idProducto);
+            int filas = stmt.executeUpdate();
+            stmt.close();
+            return filas > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false; } }
     
     
     

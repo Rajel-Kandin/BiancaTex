@@ -20,7 +20,7 @@ public class Conexion {
 			System.out.println("Se conectó");
 		} catch (SQLException e) {
 			System.out.println("No se conectó");
-
+			System.exit(0); 
 		}
 	}
 	public static Conexion getInstance() {

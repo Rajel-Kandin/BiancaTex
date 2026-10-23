@@ -1,5 +1,4 @@
 package BLL;
-import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
@@ -14,8 +13,6 @@ public class Producto {
 	private int stockActual;
 	private  CategoriasProd categoria;
 	private String talle;
-	private static LinkedList<Producto> productos = new   LinkedList<Producto>();
-
 
 
 	public Producto(String idProducto, String nombre, Double precio, int stockActual, CategoriasProd categoria,
@@ -70,17 +67,6 @@ public class Producto {
 	public void setStockActual(int stockActual) {
 		this.stockActual = stockActual;
 	}
-
-
-	public static LinkedList<Producto> getProductos() {
-		return productos;
-	}
-
-
-	public static void setProductos(LinkedList<Producto> productos) {
-		Producto.productos = productos;
-	}
-	
 	
 
 
@@ -166,30 +152,32 @@ public class Producto {
 	    Producto p = ControllerProducto.buscarProductoPorId(id);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún producto con ese código");
-	        return;
-	    }
+	        return; }
 
-	    String nuevoNombre = Validaciones.validarLetras("Nombre del producto:");
+
+	    String nuevoNombre = Validaciones.validarLetras("Nombre del producto:", p.getNombre());
 	    if (nuevoNombre == null) return;
-	    Double nuevoPrecio = Validaciones.validarDouble("Precio:");
+	    Double nuevoPrecio = Validaciones.validarDouble("Precio:", String.valueOf(p.getPrecio()));
 	    if (nuevoPrecio == null) return;
-	    String stockTexto = Validaciones.validarNumeros("Stock:");
+	    String stockTexto = Validaciones.validarNumeros("Stock:", String.valueOf(p.getStockActual()));
 	    if (stockTexto == null) return;
 	    if (stockTexto.length() > 9) {
 	        JOptionPane.showMessageDialog(null, "El stock es demasiado grande.");
 	        return; }
 	    int nuevoStock = Integer.parseInt(stockTexto);
-	    String nuevoTalle = Validaciones.validarLetras("Talle:");
+	    String nuevoTalle = Validaciones.validarLetras("Talle:", p.getTalle());
 	    if (nuevoTalle == null) return;
-	    CategoriasProd nuevaCategoria = CategoriasProd.ElegirCategoria();
+	    CategoriasProd nuevaCategoria = CategoriasProd.ElegirCategoria(p.getCategoria());
 	    if (nuevaCategoria == null) return;
 
 	    boolean editado = ControllerProducto.editarProducto(id, nuevoNombre, nuevoPrecio, nuevoStock, nuevaCategoria, nuevoTalle);
 	    if (editado) {
-	        JOptionPane.showMessageDialog(null, "Producto editado correctamente");
-	    }
-	}
+	        JOptionPane.showMessageDialog(null, "Producto editado correctamente");}
+	                    }
 
+	
+	
+	
 
 	// eliminar producto
 	public static void eliminarProducto() {
@@ -199,19 +187,16 @@ public class Producto {
 	    Producto p = ControllerProducto.buscarProductoPorId(id);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún producto con ese código");
-	        return;
-	    }
+	        return;}
 
 	    int confirmacion = JOptionPane.showConfirmDialog(null,
 	            "¿Seguro que querés eliminar " + p.getNombre() + "?",
 	            "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
 
 	    if (confirmacion == JOptionPane.YES_OPTION) {
-	        boolean eliminado = ControllerProducto.eliminarProducto(id);
+	        boolean eliminado = ControllerProducto.desactivarProducto(id);
 	        if (eliminado) {
-	            JOptionPane.showMessageDialog(null, "Producto eliminado correctamente");
-	        }
-	    }
+	            JOptionPane.showMessageDialog(null, "Producto eliminado correctamente"); } }
 	}
 
 

@@ -1,10 +1,7 @@
 package BLL;
-import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
-import DDL.ControllerLocal;
-import DDL.ControllerUsuario;
 
 public class Admin extends Usuario {
 
@@ -17,7 +14,7 @@ public class Admin extends Usuario {
 	    public void verMenu() {
 	        String[] opciones = {
 	            "Gestionar usuarios", "Gestionar productos", "Gestionar proveedores",  "Gestionar locales", "Seccion compras", "Seccion ventas", "Cuenta corriente",
-	            "Bajo stock", "Salir" };
+	            "Bajo stock", "Ver tickets" , "Salir" };
 	        
 	        
 	        int seleccion;
@@ -32,16 +29,14 @@ public class Admin extends Usuario {
             case 4: seccionCompras(); break;
             case 5: seccionVentas(); break;
             case 6: seccionCuentaCorriente(); break;
-            case 7: Producto.verBajoStock(); break; }	
-			} while (seleccion!=8);}
+            case 7: Producto.verBajoStock(); break; 
+            case 8: Venta.verTickets(); break;
+	        }}while (seleccion != 9 && seleccion != -1);}
 	        
 	    
 	    
-	    
-	    
-	       //funcion de crud para usuarios
 	    public void gestionarUsuarios() {
-	        String[] opcionesUsuarios = {"Crear", "Buscar", "Editar", "Desactivar","Ver usuarios" ,  "Volver"};
+	        String[] opcionesUsuarios = {"Crear", "Buscar", "Editar", "Activar", "Desactivar" ,"Ver usuarios" ,  "Volver"};
 	        int seleccionUsuarios;
 
 	        do {  seleccionUsuarios = JOptionPane.showOptionDialog(null, "Crud usuarios - Elija una opción", "Usuarios",
@@ -52,10 +47,10 @@ public class Admin extends Usuario {
 	                case 0: crearUsuario(); break;
 	                case 1: buscarUsuario(); break;
 	                case 2: editarUsuario(); break;
-	                case 3: desactivarUsuario(); break;
-	                case 4: verUsuarios();break;}
-
-	        } while (seleccionUsuarios != 5  && seleccionUsuarios != -1);}
+	                case 3: activarUsuario(); break;
+	                case 4: desactivarUsuario(); break;
+	                case 5: verUsuarios(); break; }
+	        } while (seleccionUsuarios != 6  && seleccionUsuarios != -1);}
 	    
 	        
 
@@ -73,8 +68,9 @@ public class Admin extends Usuario {
 		                case 2: Producto.editarProducto(); break;
 		                case 3: Producto.eliminarProducto(); break;
 		                case 4: Producto.verProductos();}
-
 		        } while (seleccionProductos != 5 && seleccionProductos != -1);}
+	        
+	        
 	        	
 	        public void gestionarProveedores() {
 	        	  String[] opcionesProveedores= {"Crear", "Buscar", "Editar", "Eliminar", "Ver proveedores" , "Volver"};
@@ -89,9 +85,7 @@ public class Admin extends Usuario {
 			                case 1: Proveedor.buscarProveedor(); break;
 			                case 2: Proveedor.editarProveedor(); break;
 			                case 3: Proveedor.eliminarProveedor(); break;
-			                case 4: Proveedor.verProveedores();break;
-			                 }
-
+			                case 4: Proveedor.verProveedores();break; }
 			        } while (seleccionProveedores != 5 && seleccionProveedores != -1);}
 	        
 	        
@@ -103,14 +97,12 @@ public class Admin extends Usuario {
 		        do {  seleccionUsuarios = JOptionPane.showOptionDialog(null, "Crud locales - Elija una opción", "Locales",
 		                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
 		                    null, opcionesUsuarios, opcionesUsuarios[0]);
-
 		            switch (seleccionUsuarios) {
 		                case 0: Local.crearLocal(); break;
 		                case 1: Local.buscarLocal(); break;
 		                case 2: Local.editarLocal(); break;
 		                case 3: Local.eliminarLocal(); break;
 		                case 4: Local.verLocales();break;}
-
 		        } while (seleccionUsuarios != 5  && seleccionUsuarios != -1);}
 	        
 	        
@@ -127,8 +119,9 @@ public class Admin extends Usuario {
 		                case 1: Compra.buscarCompra(); break;
 		                case 2: Compra.eliminarCompra(); break;
 		                case 3: Compra.verCompras();}
-
 		        } while (seleccionCompras != 4 && seleccionCompras != -1);}
+		    
+		    
 		    
 		    public void seccionVentas() {
 		        String[] opcionesVentas = {"Registrar venta", "Buscar", "Eliminar", "Ver ventas", "Volver"};
@@ -138,14 +131,11 @@ public class Admin extends Usuario {
 		            seleccionVentas = JOptionPane.showOptionDialog(null, "Seccion ventas - Elija una opción", "Ventas",
 		                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
 		                    null, opcionesVentas, opcionesVentas[0]);
-
 		            switch (seleccionVentas) {
 		                case 0: Venta.registrarVenta(this); break;
 		                case 1: Venta.buscarVenta(); break;
 		                case 2: Venta.eliminarVenta(); break;
-		                case 3: Venta.verVentas(); break;
-		            }
-
+		                case 3: Venta.verVentas(); break;  }
 		        } while (seleccionVentas != 4 && seleccionVentas != -1); }
 		    	
 		    
@@ -163,8 +153,7 @@ public class Admin extends Usuario {
 			            case 1: CuentaCorriente.cargarSaldoInicial(this);  break;
 			            case 2: CuentaCorriente.crearIngreso(this); break;
 			            case 3:  CuentaCorriente.crearEgreso(this); break;
-			            case 4: CuentaCorriente.eliminarMovimientoManual();break;
-			        }
+			            case 4: CuentaCorriente.eliminarMovimientoManual();break;  }
 			    } while (elegido != 5 && elegido != JOptionPane.CLOSED_OPTION);}
 	   
 			

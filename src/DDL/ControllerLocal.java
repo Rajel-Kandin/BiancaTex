@@ -9,11 +9,12 @@ import BLL.Local;
 
 public class ControllerLocal {
 
+    // trae los locales activos
     public static LinkedList<Local> obtenerLocales() {
         LinkedList<Local> locales = new LinkedList<>();
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "SELECT * FROM local"
+                "SELECT * FROM local WHERE activo = 1"
             );
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -26,6 +27,7 @@ public class ControllerLocal {
         }
         return locales;
     }
+    
 
     public static Local buscarLocalPorId(int idLocal) {
         Local local = null;
@@ -43,9 +45,9 @@ public class ControllerLocal {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return local;
-    }
+        return local; }
 
+    
     public static boolean crearLocal(String direccion) {
         boolean exito = false;
         try {
@@ -58,8 +60,8 @@ public class ControllerLocal {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return exito;
-    }
+        return exito;}
+    
 
     public static boolean editarLocal(Local local) {
         boolean exito = false;
@@ -72,16 +74,16 @@ public class ControllerLocal {
             exito = stmt.executeUpdate() > 0;
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return exito;
-    }
+            e.printStackTrace(); }
+        return exito; }
+    
 
-    public static boolean eliminarLocal(int idLocal) {
+    // desactiva un local (borrado lógico)
+    public static boolean desactivarLocal(int idLocal) {
         boolean exito = false;
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "DELETE FROM local WHERE id_local = ?"
+                "UPDATE local SET activo = 0 WHERE id_local = ? AND activo = 1"
             );
             stmt.setInt(1, idLocal);
             exito = stmt.executeUpdate() > 0;
@@ -89,6 +91,6 @@ public class ControllerLocal {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return exito;
-    }
+        return exito; }
+    
 }

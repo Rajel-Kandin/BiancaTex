@@ -28,7 +28,7 @@ public class Empleado  extends  Usuario{
 
 	 @Override
 	    public void verMenu() {
-	        String[] opciones = { "Seccion ventas",  "Ver  productos",  "Bajo stock",  "Salir" };
+	        String[] opciones = { "Seccion ventas",  "Ver productos",  "Bajo stock",  "Salir" };
 	        
 	        int seleccion;
 			do { 
@@ -40,7 +40,7 @@ public class Empleado  extends  Usuario{
          case 0: seccionVentas(); break;
          case 1: Producto.verProductos(); break;
          case 2:Producto.verBajoStock(); break;}
-			} while (seleccion!=3);}
+			} while (seleccion != 3 && seleccion != -1);}
 	        
 	       
 	 public void seccionVentas() {

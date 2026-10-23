@@ -178,8 +178,7 @@ public class ControllerCompra {
                 "FROM compra " +
                 "INNER JOIN proveedor ON compra.fk_cuit = proveedor.cuit " +
                 "INNER JOIN usuario ON compra.fk_usuario = usuario.id_usuario " +
-                "ORDER BY compra.fecha DESC"
-            );
+                "ORDER BY compra.fecha DESC");
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -190,15 +189,13 @@ public class ControllerCompra {
                          " | Registrada por: " + rs.getString("usuario_nombre") +
                          " | Total pagado: $" + rs.getDouble("total") + "\n";
                 lista += obtenerDetalleCompra(idCompra);
-                lista += "----------------------------------------\n";
-            }
+                lista += "----------------------------------------\n"; }
+            
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return lista;
-    }
+            e.printStackTrace(); }
+        return lista;}
 
     private static String obtenerDetalleCompra(int idCompra) {
         String detalle = "";

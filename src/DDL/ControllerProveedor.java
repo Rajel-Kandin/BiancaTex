@@ -31,12 +31,10 @@ public class ControllerProveedor {
             return false;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
-        }
-    }
+            return false;  } }
 
 
-    // Busca proveedor por CUIT y devuelve el objeto Proveedor (o null si no existe)
+    // Busca proveedor por CUIT 
     public static Proveedor buscarProveedorPorCuit(String cuit) {
         Proveedor proveedor = null;
         try {
@@ -59,11 +57,10 @@ public class ControllerProveedor {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return proveedor;
-    }
+        return proveedor; }
 
 
-    // Edita los datos de un proveedor existente
+    // Edita los datos de un proveedor 
     public static boolean editarProveedor(String cuit, String nombre, String direccion, String telefono) {
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
@@ -80,39 +77,34 @@ public class ControllerProveedor {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
-        }
-    }
+            return false;   } }
 
+    
 
-    // elimina un proveedor
-    public static boolean eliminarProveedor(String cuit) {
+ // desactiva un proveedor (borrado lógico)
+    public static boolean desactivarProveedor(String cuit) {
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "DELETE FROM proveedor WHERE cuit = ?"
+                "UPDATE proveedor SET activo = 0 WHERE cuit = ? AND activo = 1"
             );
             stmt.setString(1, cuit);
             int filas = stmt.executeUpdate();
             stmt.close();
             return filas > 0;
 
-        } catch (java.sql.SQLIntegrityConstraintViolationException e) {
-            JOptionPane.showMessageDialog(null, "No se puede eliminar: el proveedor tiene compras asociadas");
-            return false;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
-        }
-    }
-
-
-    // muestra los proveedores
+            return false; }
+                                      }
+    
+    
+    // muestra los proveedores activos
     public static String obtenerListaProveedores() {
         String lista = "";
 
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "SELECT * FROM proveedor ORDER BY nombre"
+                "SELECT * FROM proveedor WHERE activo = 1 ORDER BY nombre"
             );
             ResultSet rs = stmt.executeQuery();
 
@@ -129,15 +121,14 @@ public class ControllerProveedor {
         }
         return lista;
     }
-    
 
 
-    // trae todos los proveedores como objetos (para ver en las compras)
+    // trae los proveedores 
     public static LinkedList<Proveedor> obtenerProveedores() {
         LinkedList<Proveedor> proveedores = new LinkedList<Proveedor>();
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "SELECT * FROM proveedor ORDER BY nombre"
+                "SELECT * FROM proveedor WHERE activo = 1 ORDER BY nombre"
             );
             ResultSet rs = stmt.executeQuery();
 
@@ -156,7 +147,4 @@ public class ControllerProveedor {
             e.printStackTrace();
         }
         return proveedores;
-    }
-    
-
-}
+    }}

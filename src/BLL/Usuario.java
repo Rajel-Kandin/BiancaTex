@@ -15,9 +15,8 @@ public abstract class Usuario implements Menu{
 	private String nombre;
 	private String mail;
 	private Boolean activo;
-	private static LinkedList<Usuario> usuarios = new   LinkedList<Usuario>();
-	private static ControllerUsuario controller = new ControllerUsuario();
-
+	//private static LinkedList<Usuario> usuarios = new   LinkedList<Usuario>();
+	
 
 	public Usuario(int idUsuario, int tipoUsuario, String dni, String nombre, String email, Boolean activo) {
 	    this.idUsuario = idUsuario;
@@ -26,7 +25,6 @@ public abstract class Usuario implements Menu{
 	    this.nombre = nombre;
 	    this.mail = email;
 	    this.activo = activo;
-	    usuarios.add(this);
 	}
 
 
@@ -38,28 +36,7 @@ public abstract class Usuario implements Menu{
 	public void setIdUsuario(int idUsuario) {
 		this.idUsuario = idUsuario;
 	}
-	
-	
 
-
-	public String getMail() {
-		return mail;
-	}
-
-
-	public void setMail(String mail) {
-		this.mail = mail;
-	}
-
-
-	public static LinkedList<Usuario> getUsuarios() {
-		return usuarios;
-	}
-
-
-	public static void setUsuarios(LinkedList<Usuario> usuarios) {
-		Usuario.usuarios = usuarios;
-	}
 
 
 	public String getDni() {
@@ -113,12 +90,7 @@ public abstract class Usuario implements Menu{
 		this.tipoUsuario = tipoUsuario;
 	}
 	
-	public static ControllerUsuario getController() {
-		return controller;
-	}
-	public static void setController(ControllerUsuario controller) {
-		Usuario.controller = controller;
-	}
+
 
 
 	@Override
@@ -127,16 +99,6 @@ public abstract class Usuario implements Menu{
 				+ nombre + ", mail=" + mail + ", activo=" + activo + "]";
 	}
 
-	
-	 
-
-		public static Usuario login(String nombre) {
-			for (Usuario usuario : usuarios) {
-				if (usuario.getNombre().toLowerCase().equals(nombre.toLowerCase())) {
-					return usuario;}}
-			return null;}
-
-	
 
 	
 		public void crearUsuario() {
@@ -195,41 +157,39 @@ public abstract class Usuario implements Menu{
 	            default: return "Desconocido";  }}
 	    
 	    
-	 // buscar usuario
+		 // buscar usuario
 	    public void buscarUsuario() {
-	        Integer dniNum = Validaciones.validarEntero("DNI del usuario a buscar:");
-	        if (dniNum == null) return;
-	        String dni = String.valueOf(dniNum);
+	        Integer idUsuario = Validaciones.validarEntero("ID del usuario a buscar:");
+	        if (idUsuario == null) return;
 
-	        Usuario u = ControllerUsuario.buscarUsuarioPorDni(dni);
+	        Usuario u = ControllerUsuario.buscarUsuarioPorId(idUsuario);
 	        if (u == null) {
-	            JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese DNI");
+	            JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese ID");
 	            return;
 	        }
 
 	        JOptionPane.showMessageDialog(null,
-	            "Nombre: " + u.getNombre() +
+	            "ID: " + u.getIdUsuario() +
+	            "\nNombre: " + u.getNombre() +
+	            "\nDNI: " + u.getDni() +
 	            "\nEmail: " + u.getEmail() +
 	            "\nTipo: " + u.getTipoTexto() +
 	            "\nActivo: " + (u.getActivo() ? "Sí" : "No"));
 	    }
-	    
-	    
-	    
+
+
 	    //editar usuario
 	    public void editarUsuario() {
-	        Integer dniNum = Validaciones.validarEntero("DNI del usuario a editar:");
-	        if (dniNum == null) return;
-	        String dni = String.valueOf(dniNum);
+	        Integer idUsuario = Validaciones.validarEntero("ID del usuario a editar:");
+	        if (idUsuario == null) return;
 
-	        Usuario u = ControllerUsuario.buscarUsuarioPorDni(dni);
+	        Usuario u = ControllerUsuario.buscarUsuarioPorId(idUsuario);
 	        if (u == null) {
-	            JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese DNI");
+	            JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese ID");
 	            return;
 	        }
 
-	        int idUsuario = u.getIdUsuario();
-	        String nuevoNombre = Validaciones.validarLetras("Nombre y apellido:");
+	        String nuevoNombre = Validaciones.validarLetras("Nombre y apellido:", u.getNombre());
 	        if (nuevoNombre == null) return;
 
 	        String nuevoEmail;
@@ -243,7 +203,8 @@ public abstract class Usuario implements Menu{
 	        } while (nuevoEmail == null);
 
 	        String[] opcionesTipo = {"Admin", "Empleado", "Contador"};
-	        int tipoSeleccionado = JOptionPane.showOptionDialog(null, "Nuevo tipo de usuario", "Editar usuario",
+	        int tipoSeleccionado = JOptionPane.showOptionDialog(null,
+	                "Tipo actual: " + u.getTipoTexto() + "\nElegí el tipo de usuario:", "Editar usuario",
 	                0, 0, null, opcionesTipo, opcionesTipo[u.getTipoUsuario() - 1]);
 	        if (tipoSeleccionado == -1) return;
 
@@ -254,50 +215,87 @@ public abstract class Usuario implements Menu{
 	            nuevoFkLocal = seleccionarLocal();
 	            if (nuevoFkLocal == null) {
 	                JOptionPane.showMessageDialog(null, "Hay que asignar un local para un Empleado");
-	                return;
-	            }
-	        }
+	                return;  } }
 
-	        boolean editado = ControllerUsuario.editarUsuario(idUsuario, dni, nuevoNombre, nuevoEmail, nuevoTipo, nuevoFkLocal);
+	        boolean editado = ControllerUsuario.editarUsuario(idUsuario, u.getDni(), nuevoNombre, nuevoEmail, nuevoTipo, nuevoFkLocal);
 	        if (editado) {
-	            JOptionPane.showMessageDialog(null, "Usuario editado correctamente");
-	        }
-	    }
+	            JOptionPane.showMessageDialog(null, "Usuario editado correctamente"); }
+	                          }
 
-	    
-	    
-	    //elimina // desactiva usuario
+
+	    //desactiva usuario
 	    public void desactivarUsuario() {
-	        Integer dniNum = Validaciones.validarEntero("DNI del usuario a desactivar:");
-	        if (dniNum == null) return;
-	        String dni = String.valueOf(dniNum);
+	        Integer idUsuario = Validaciones.validarEntero("ID del usuario a desactivar:");
+	        if (idUsuario == null) return;
 
-	        Usuario u = ControllerUsuario.buscarUsuarioPorDni(dni);
+	        Usuario u = ControllerUsuario.buscarUsuarioPorId(idUsuario);
 	        if (u == null) {
-	            JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese DNI");
+	            JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese ID");
+	            return;
+	        }
+
+	        // no puede desactivarse a sí mismo
+	        if (u.getIdUsuario() == this.getIdUsuario()) {
+	            JOptionPane.showMessageDialog(null, "No podés desactivar tu propio usuario");
+	            return;}
+
+	        // no se puede desactivar uno que ya está desactivado
+	        if (!u.getActivo()) {
+	            JOptionPane.showMessageDialog(null, u.getNombre() + " ya está desactivado");
 	            return;
 	        }
 
 	        int confirmacion = JOptionPane.showConfirmDialog(null,
 	                "¿Seguro que querés desactivar a " + u.getNombre() + "?",
-	                "Confirmar desactivacion", JOptionPane.YES_NO_OPTION);
+	                "Confirmar desactivación", JOptionPane.YES_NO_OPTION);
 
 	        if (confirmacion == JOptionPane.YES_OPTION) {
 	            boolean desactivado = ControllerUsuario.desactivarUsuario(u.getIdUsuario());
 	            if (desactivado) {
 	                JOptionPane.showMessageDialog(null, "Usuario desactivado correctamente");
 	            } } }
-	    
+
+
+	    // activa un usuario desactivado
+	    public void activarUsuario() {
+	        Integer idUsuario = Validaciones.validarEntero("ID del usuario a activar:");
+	        if (idUsuario == null) return;
+
+	        Usuario u = ControllerUsuario.buscarUsuarioPorId(idUsuario);
+	        if (u == null) {
+	            JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese ID");
+	            return; }
+
+	        // no puede activarse a sí mismo
+	        if (u.getIdUsuario() == this.getIdUsuario()) {
+	            JOptionPane.showMessageDialog(null, "No podés activar tu propio usuario");
+	            return; }
+
+	        // no se puede activar uno que ya está activo
+	        if (u.getActivo()) {
+	            JOptionPane.showMessageDialog(null, u.getNombre() + " ya está activo");
+	            return; }
+
+	        int confirmacion = JOptionPane.showConfirmDialog(null,
+	                "¿Seguro que querés activar a " + u.getNombre() + "?",
+	                "Confirmar activación", JOptionPane.YES_NO_OPTION);
+
+	        if (confirmacion == JOptionPane.YES_OPTION) {
+	            boolean activado = ControllerUsuario.activarUsuario(u.getIdUsuario());
+	            if (activado) {
+	                JOptionPane.showMessageDialog(null, "Usuario activado correctamente");
+	            } } }
 	
-	 // ver usuarios
+	    
+	    
+	 //ver usuarios
 	    public void verUsuarios() {
 	        String lista = ControllerUsuario.obtenerListaUsuarios();
 	        if (lista.isEmpty()) {
 	            JOptionPane.showMessageDialog(null, "No hay usuarios cargados");
-	            return;
-	        }
+	            return;}
 	        JOptionPane.showMessageDialog(null, lista, "Usuarios", JOptionPane.PLAIN_MESSAGE);
-	    }
+	                                }
 	
 	
 	

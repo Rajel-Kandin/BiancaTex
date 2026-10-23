@@ -1,7 +1,5 @@
 package BLL;
 import java.time.LocalDate;
-import java.util.LinkedList;
-
 import javax.swing.JOptionPane;
 
 import DDL.ControllerCuentaCorriente;
@@ -9,57 +7,13 @@ import repository.Validaciones;
 
 public class CuentaCorriente {
 
-	private Double saldo;
-	private static LinkedList<Movimiento> movimientos = new   LinkedList<Movimiento>();
 
-
-	public CuentaCorriente(Double saldo) {
-		super();
-		this.saldo = saldo;
-	}
-
-
-	public Double getSaldo() {
-		return saldo;
-	}
-	public void setSaldo(Double saldo) {
-		this.saldo = saldo;
-	}
-	public static LinkedList<Movimiento> getMovimientos() {
-		return movimientos;
-	}
-	public static void setMovimientos(LinkedList<Movimiento> movimientos) {
-		CuentaCorriente.movimientos = movimientos;
-	}
-
-
-	@Override
-	public String toString() {
-		return "CuentaCorriente [saldo=" + saldo + "]";
-	}
-
-
-	public LinkedList<Venta> filtrarVentas() {
-	    return null;
-	}
-
-	public LinkedList<Compra> filtrarCompras() {
-	    return null;
-	}
-
-	public LinkedList<Ingreso> filtrarIngresos() {
-	    return null;
-	}
-
-	public LinkedList<Egreso> filtrarEgresos() {
-	    return null;
-	}
 
 
 	// cargar saldo inicial (solo si la cuenta está vacía)
 	public static void cargarSaldoInicial(Usuario usuario) {
 	    if (ControllerCuentaCorriente.existenMovimientos()) {
-	        JOptionPane.showMessageDialog(null, "Ya hay movimientos cargados. El saldo inicial solo se carga al principio.");
+	        JOptionPane.showMessageDialog(null, "Ya hay un saldo  cargado. El saldo inicial solo se carga una vez.");
 	        return;  }
 
 	    Double saldoInicial = Validaciones.validarDouble("Ingrese el saldo inicial de la cuenta:");
@@ -77,19 +31,34 @@ public class CuentaCorriente {
 	    } else {
 	        JOptionPane.showMessageDialog(null, "Error al cargar el saldo inicial");
 	    }}
-	
 
 
-	// ver todos los movimientos y el saldo actual
+	// ver movimientos (con filtros) y el saldo actual
 	public static void verCuentaCorriente() {
-	    String lista = ControllerCuentaCorriente.obtenerListaMovimientos();
-	    if (lista.isEmpty()) {
-	        JOptionPane.showMessageDialog(null, "No hay movimientos cargados");
-	        return;
-	    }
-	    double saldo = ControllerCuentaCorriente.obtenerSaldo();
-	    lista += "\nSALDO ACTUAL: $" + String.format("%.2f", saldo);
-	    JOptionPane.showMessageDialog(null, lista, "Cuenta corriente", JOptionPane.PLAIN_MESSAGE);}
+	    String[] opciones = {"Todos", "Ventas", "Compras", "Ingresos", "Egresos", "Volver"};
+	    String filtro = "Todos";
+	    boolean seguir = true;
+
+	    while (seguir) {
+	        String lista = ControllerCuentaCorriente.obtenerListaMovimientos(filtro);
+
+	        if (lista.isEmpty()) {
+	            if (filtro.equals("Todos")) {
+	                JOptionPane.showMessageDialog(null, "No hay movimientos cargados");
+	                return;
+	            }
+	            lista = "No hay movimientos de este tipo. \n";  }
+
+	        double saldo = ControllerCuentaCorriente.obtenerSaldo();
+	        lista += "\nSALDO ACTUAL: $" + String.format("%.2f", saldo);
+
+	        int eleccion = JOptionPane.showOptionDialog(null, lista, "Cuenta corriente - " + filtro,
+	                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
+
+	        if (eleccion == -1 || eleccion == 5) {
+	            seguir = false;
+	        } else {
+	            filtro = opciones[eleccion];  }  }}
 	
 
 	
@@ -177,6 +146,9 @@ public class CuentaCorriente {
 	        JOptionPane.showMessageDialog(null, "No existe un ingreso/egreso manual con ese número");
 	    }}
 
+	
+	
+	
 
 
 }

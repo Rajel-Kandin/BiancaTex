@@ -97,7 +97,7 @@ public class Local {
         if (idLocal == null) {
             return;
         }
-        boolean exito = ControllerLocal.eliminarLocal(idLocal);
+        boolean exito = ControllerLocal.desactivarLocal(idLocal);
         if (exito) {
             JOptionPane.showMessageDialog(null, "Local eliminado correctamente.");
         } else {

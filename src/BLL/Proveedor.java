@@ -1,5 +1,4 @@
 package BLL;
-import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
@@ -12,8 +11,6 @@ public class Proveedor {
 	private String cuit;
 	private String direccion;
 	private String telefono;
-	private static LinkedList<Proveedor> proveedores = new   LinkedList<Proveedor>();
-	
 	
 	public Proveedor(String nombre, String cuit, String direccion, String telefono) {
 		super();
@@ -64,14 +61,6 @@ public class Proveedor {
 	}
 
 
-	public static LinkedList<Proveedor> getProveedores() {
-		return proveedores;
-	}
-
-
-	public static void setProveedores(LinkedList<Proveedor> proveedores) {
-		Proveedor.proveedores = proveedores;
-	}
 
 
 	@Override
@@ -92,9 +81,8 @@ public class Proveedor {
 
 	    boolean creado = ControllerProveedor.crearProveedor(cuit, nombre, direccion, telefono);
 	    if (creado) {
-	        JOptionPane.showMessageDialog(null, "Proveedor creado correctamente");
-	    }
-	}
+	        JOptionPane.showMessageDialog(null, "Proveedor creado correctamente");}
+	                 }
 
 
 	// buscar proveedor
@@ -105,15 +93,13 @@ public class Proveedor {
 	    Proveedor p = ControllerProveedor.buscarProveedorPorCuit(cuit);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún proveedor con ese CUIT");
-	        return;
-	    }
+	        return; }
 
 	    JOptionPane.showMessageDialog(null,
 	        "Nombre: " + p.getNombre() +
 	        "\nCUIT: " + p.getCuit() +
 	        "\nDirección: " + p.getDireccion() +
-	        "\nTeléfono: " + p.getTelefono());
-	}
+	        "\nTeléfono: " + p.getTelefono());}
 
 
 	// editar proveedor
@@ -124,23 +110,22 @@ public class Proveedor {
 	    Proveedor p = ControllerProveedor.buscarProveedorPorCuit(cuit);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún proveedor con ese CUIT");
-	        return;
-	    }
+	        return;}
 
-	    String nuevoNombre = Validaciones.validarLetras("Nombre del proveedor:");
+
+	    String nuevoNombre = Validaciones.validarLetras("Nombre del proveedor:", p.getNombre());
 	    if (nuevoNombre == null) return;
 	    String nuevaDireccion = JOptionPane.showInputDialog("Dirección:", p.getDireccion());
 	    if (nuevaDireccion == null) return;
-	    String nuevoTelefono = Validaciones.validarNumeros("Teléfono:");
+	    String nuevoTelefono = Validaciones.validarNumeros("Teléfono:", p.getTelefono());
 	    if (nuevoTelefono == null) return;
 
 	    boolean editado = ControllerProveedor.editarProveedor(cuit, nuevoNombre, nuevaDireccion, nuevoTelefono);
 	    if (editado) {
-	        JOptionPane.showMessageDialog(null, "Proveedor editado correctamente");
-	    }
-	}
+	        JOptionPane.showMessageDialog(null, "Proveedor editado correctamente"); }
+	                       }
 
-
+	
 	// eliminar proveedor
 	public static void eliminarProveedor() {
 	    String cuit = Validaciones.validarNumeros("CUIT del proveedor a eliminar:");
@@ -149,20 +134,18 @@ public class Proveedor {
 	    Proveedor p = ControllerProveedor.buscarProveedorPorCuit(cuit);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún proveedor con ese CUIT");
-	        return;
-	    }
+	        return;}
 
 	    int confirmacion = JOptionPane.showConfirmDialog(null,
 	            "¿Seguro que querés eliminar a " + p.getNombre() + "?",
 	            "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
 
 	    if (confirmacion == JOptionPane.YES_OPTION) {
-	        boolean eliminado = ControllerProveedor.eliminarProveedor(cuit);
+	        boolean eliminado = ControllerProveedor.desactivarProveedor(cuit);
 	        if (eliminado) {
 	            JOptionPane.showMessageDialog(null, "Proveedor eliminado correctamente");
-	        }
-	    }
-	}
+	        }}
+	                    }
 
 
 	// ver proveedores
@@ -170,10 +153,9 @@ public class Proveedor {
 	    String lista = ControllerProveedor.obtenerListaProveedores();
 	    if (lista.isEmpty()) {
 	        JOptionPane.showMessageDialog(null, "No hay proveedores cargados");
-	        return;
-	    }
+	        return; }
 	    JOptionPane.showMessageDialog(null, lista, "Proveedores", JOptionPane.PLAIN_MESSAGE);
-	}
+                }
 	
 	
 	

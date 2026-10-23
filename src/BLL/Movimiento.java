@@ -39,7 +39,7 @@ public abstract  class   Movimiento {
 		return "Movimiento [idMovimiento=" + idMovimiento + ", fecha=" + fecha + ", monto=" + monto + "]";
 	}
 	
-	public abstract String  VerInfo();
+	
 	
 	
 	

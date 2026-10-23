@@ -11,7 +11,7 @@ public class Contador extends Usuario {
 	@Override
     public void verMenu() {
         String[] opciones = {
-            "Ver cuenta corriente",
+            "Ver tickets",
             "Salir" };
         
         
@@ -23,12 +23,11 @@ public class Contador extends Usuario {
 
         	
         switch (seleccion) {
-        case 0: verCuentaCorriente(); break;}	
-		} while (seleccion!=1);}
+        case 0: Venta.verTickets(); break;}	
+		} while (seleccion!=1 && seleccion != -1);}
         
        
         
-        public void verCuentaCorriente() {}
        
         
     }

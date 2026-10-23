@@ -16,39 +16,47 @@ public class ControllerUsuario {
 
 	
 	//ingresar
-	public static Usuario login(String nombre, String password) {
+	public static Usuario login(String email, String password) {
 	    Usuario usuario = null;
 	    try {
 	        PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-	            "SELECT * FROM usuario WHERE nombre = ?"
+	                "SELECT * FROM usuario WHERE email = ?"
 	        );
-	        stmt.setString(1, nombre);
+	        stmt.setString(1, email);
 	        ResultSet rs = stmt.executeQuery();
 
 	        if (rs.next() && Hashing.verificar(password, rs.getString("password"))) {
+
+	            // email y contraseña correctos, pero está desactivado
+	            if (!rs.getBoolean("activo")) {
+	                JOptionPane.showMessageDialog(null, "Tu usuario está desactivado. Consultá con un administrador.");
+	                rs.close();
+	                stmt.close();
+	                return null; }
+
 	            int id = rs.getInt("id_usuario");
 	            String dniBd = rs.getString("dni");
 	            String nombreBd = rs.getString("nombre");
-	            String email = rs.getString("email");
+	            String emailBd = rs.getString("email");
 	            int tipo = rs.getInt("fk_tipoDeUsuario");
 	            boolean activo = rs.getBoolean("activo");
 
 	            if (tipo == 1) {
-	                usuario = new Admin(id, dniBd, nombreBd, email, activo);
+	                usuario = new Admin(id, dniBd, nombreBd, emailBd, activo);
 	            } else if (tipo == 2) {
 	                Local local = obtenerLocal(rs.getInt("fk_local"));
-	                usuario = new Empleado(id, dniBd, nombreBd, email, activo, local);
+	                usuario = new Empleado(id, dniBd, nombreBd, emailBd, activo, local);
 	            } else if (tipo == 3) {
-	                usuario = new Contador(id, dniBd, nombreBd, email, activo);
-	            }
-	        }
+	                usuario = new Contador(id, dniBd, nombreBd, emailBd, activo); }
+	        } else {
+	            JOptionPane.showMessageDialog(null, "Email o contraseña incorrectos"); }
+
 	        rs.close();
 	        stmt.close();
 	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	    return usuario;
-	}
+	        e.printStackTrace(); }
+	    return usuario; }
+	 
     
     //obtiene el local
     private static Local obtenerLocal(int idLocal) throws SQLException {
@@ -64,6 +72,7 @@ public class ControllerUsuario {
         rs.close();
         stmt.close();
         return local; }
+    
     
   //crea usuario
     public static boolean crearUsuario(String dni, String nombre, String email, String password, int tipo, Integer fkLocal) {
@@ -95,39 +104,40 @@ public class ControllerUsuario {
             return false;  }}
     
     
+
     
-    
- // Busca usuario por DNI y devuelve sus datos
-    public static Usuario buscarUsuarioPorDni(String dni) {    	Usuario usuario = null;
-        String sql = "SELECT * FROM usuario WHERE dni = ?";
+    // Busca usuario por ID
+    public static Usuario buscarUsuarioPorId(int idUsuario) {
+        Usuario usuario = null;
+        try {
+            PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
+                "SELECT * FROM usuario WHERE id_usuario = ?"
+            );
+            stmt.setInt(1, idUsuario);
+            ResultSet rs = stmt.executeQuery();
 
-        try (PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(sql)) {
-            stmt.setString(1, dni);
-            try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                int id         = rs.getInt("id_usuario");
+                String dni     = rs.getString("dni");
+                String nombre  = rs.getString("nombre");
+                String email   = rs.getString("email");
+                int tipo       = rs.getInt("fk_tipoDeUsuario");
+                boolean activo = rs.getBoolean("activo");
 
-                if (rs.next()) {
-                    int id          = rs.getInt("id_usuario");
-                    String dniBd    = rs.getString("dni");
-                    String nombre   = rs.getString("nombre");
-                    String email    = rs.getString("email");
-                    int tipo        = rs.getInt("fk_tipoDeUsuario");
-                    boolean activo  = rs.getBoolean("activo");
-
-                    switch (tipo) {
-                        case 1:
-                            usuario = new Admin(id, dniBd, nombre, email, activo);
-                            break;
-                        case 2:
-                            int idLocal = rs.getInt("fk_local"); // 0 si es null
-                            Local local = obtenerLocal(idLocal); // ajustá si tu método tiene otra firma
-                            usuario = new Empleado(id, dniBd, nombre, email, activo, local);
-                            break;
-                        case 3:
-                            usuario = new Contador(id, dniBd, nombre, email, activo);
-                            break;
-                    }
-                }
+                switch (tipo) {
+                    case 1:
+                        usuario = new Admin(id, dni, nombre, email, activo);
+                        break;
+                    case 2:
+                        Local local = obtenerLocal(rs.getInt("fk_local"));
+                        usuario = new Empleado(id, dni, nombre, email, activo, local);
+                        break;
+                    case 3:
+                        usuario = new Contador(id, dni, nombre, email, activo);
+                        break; }
             }
+            rs.close();
+            stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -179,6 +189,23 @@ public class ControllerUsuario {
             return false; }}
     
     
+    
+    // activar (activo = 1)
+    public static boolean activarUsuario(int idUsuario) {
+        try {
+            PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
+                "UPDATE usuario SET activo = 1 WHERE id_usuario = ?"
+            );
+            stmt.setInt(1, idUsuario);
+            int filas = stmt.executeUpdate();
+            stmt.close();
+            return filas > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false; }}
+    
+    
+    
  // muestra los usuarios
     public static String obtenerListaUsuarios() {
         String lista = "";
@@ -210,8 +237,7 @@ public class ControllerUsuario {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return lista;
-    }
+        return lista; }
    
 	
 }
