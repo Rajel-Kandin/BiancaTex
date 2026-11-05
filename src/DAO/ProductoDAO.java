@@ -1,16 +1,13 @@
-package DDL;
+package DAO;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
-
-import javax.swing.JOptionPane;
-
 import BLL.CategoriasProd;
 import BLL.Producto;
 
-public class ControllerProducto {
+public class ProductoDAO {
 
     // crea producto 
     public static boolean crearProducto(String nombre, double precio, int stock, CategoriasProd categoria, String talle) {
@@ -64,13 +61,12 @@ public class ControllerProducto {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
         return producto;
     }
 
 
-    // Edita los datos de un producto existente
+    // edita producto
     public static boolean editarProducto(String idProducto, String nombre, double precio, int stock, CategoriasProd categoria, String talle) {
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
@@ -89,12 +85,11 @@ public class ControllerProducto {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
-        }
+            return false; }
     }
 
 
-    // desactiva un producto (borrado lógico): la fila queda en la tabla con activo = 0
+    // desactiva un producto 
     public static boolean desactivarProducto(String idProducto) {
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
@@ -108,37 +103,11 @@ public class ControllerProducto {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;}
-               }
-
-
-    // muestra los productos activos
-    public static String obtenerListaProductos() {
-        String lista = "";
-
-        try {
-            PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "SELECT * FROM producto WHERE activo = 1 ORDER BY nombre"
-            );
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                lista += "ID: " + rs.getInt("id_productos") +
-                         " | " + rs.getString("nombre") +
-                         " | $" + rs.getDouble("precio") +
-                         " | Stock: " + rs.getInt("stock") +
-                         " | " + rs.getString("categoria") +
-                         " | Talle: " + rs.getString("talle") + "\n";
-            }
-            rs.close();
-            stmt.close();
-        } catch (SQLException e) {
-            e.printStackTrace();}
-        return lista; }
-
+                                     }
 
     // productos activos con stock menor a 20
     public static String obtenerListaBajoStock() {
-        String lista = "";
+        StringBuilder lista = new StringBuilder();
 
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
@@ -147,17 +116,17 @@ public class ControllerProducto {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                lista += "ID: " + rs.getInt("id_productos") +
-                         " | " + rs.getString("nombre") +
-                         " | " + rs.getString("categoria") +
-                         " | Talle: " + rs.getString("talle") +
-                         " | Stock: " + rs.getInt("stock") + "\n";
+                lista.append("ID: " + rs.getInt("id_productos") +
+                             " | " + rs.getString("nombre") +
+                             " | " + rs.getString("categoria") +
+                             " | Talle: " + rs.getString("talle") +
+                             " | Stock: " + rs.getInt("stock") + "\n");
             }
             rs.close();
             stmt.close();
         } catch (SQLException e) {
             e.printStackTrace(); }
-        return lista;
+        return lista.toString();
                                          }
     
     
@@ -179,12 +148,13 @@ public class ControllerProducto {
             return false;   } }
     
 
- // trae todos los productos 
+ 
+    // trae todos los productos activos
     public static LinkedList<Producto> obtenerProductos() {
         LinkedList<Producto> productos = new LinkedList<Producto>();
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "SELECT * FROM producto ORDER BY nombre"
+                "SELECT * FROM producto WHERE activo = 1 ORDER BY nombre"
             );
             ResultSet rs = stmt.executeQuery();
 
@@ -193,10 +163,7 @@ public class ControllerProducto {
                 String textoCategoria = rs.getString("categoria");
                 for (CategoriasProd c : CategoriasProd.values()) {
                     if (c.name().equalsIgnoreCase(textoCategoria)) {
-                        categoria = c;
-                    }
-                }
-
+                        categoria = c;  }}
                 Producto p = new Producto(
                     String.valueOf(rs.getInt("id_productos")),
                     rs.getString("nombre"),
@@ -205,31 +172,102 @@ public class ControllerProducto {
                     categoria,
                     rs.getString("talle")
                 );
-                productos.add(p);
+                productos.add(p);}
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();  }
+        return productos;  }
+    
+    
+    
+   //productos activos
+    public static String obtenerListaProductos() {
+        return obtenerListaProductos("Todas", "");
+                                            }
+
+
+    //productos activos filtrados por categoría
+    public static String obtenerListaProductos(String categoria) {
+        return obtenerListaProductos(categoria, "");
+                                                    }
+
+
+    // muestra los productos activos filtrados por categoría y nombre
+    public static String obtenerListaProductos(String categoria, String busqueda) {
+        StringBuilder lista = new StringBuilder();
+
+        try {
+            PreparedStatement stmt;
+            if (categoria.equals("Todas")) {
+                stmt = Conexion.getInstance().getConnection().prepareStatement(
+                    "SELECT * FROM producto WHERE activo = 1 AND nombre LIKE ? ORDER BY nombre"
+                );
+                stmt.setString(1, "%" + busqueda + "%");
+            } else {
+                stmt = Conexion.getInstance().getConnection().prepareStatement(
+                    "SELECT * FROM producto WHERE activo = 1 AND categoria = ? AND nombre LIKE ? ORDER BY nombre"
+                );
+                stmt.setString(1, categoria);
+                stmt.setString(2, "%" + busqueda + "%");
+            }
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                lista.append("ID: " + rs.getInt("id_productos") +
+                             " | " + rs.getString("nombre") +
+                             " | $" + rs.getDouble("precio") +
+                             " | Stock: " + rs.getInt("stock") +
+                             " | " + rs.getString("categoria") +
+                             " | Talle: " + rs.getString("talle") + "\n");
             }
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return productos;  }
+            e.printStackTrace(); }
+        return lista.toString();
+                                                 }
     
     
- // suma (o resta si la cantidad es negativa) al stock actual de la BD
-    public static boolean sumarStock(String idProducto, int cantidad) {
+    // productos activos filtrados por categoria y por nombre
+    public static LinkedList<Producto> obtenerProductosFiltrados(String categoria, String busqueda) {
+        LinkedList<Producto> productos = new LinkedList<Producto>();
         try {
-            PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "UPDATE producto SET stock = stock + ? WHERE id_productos = ?");
-            stmt.setInt(1, cantidad);
-            stmt.setString(2, idProducto);
-            int filas = stmt.executeUpdate();
+            PreparedStatement stmt;
+            if (categoria.equals("Todas")) {
+                stmt = Conexion.getInstance().getConnection().prepareStatement(
+                    "SELECT * FROM producto WHERE activo = 1 AND nombre LIKE ? ORDER BY nombre");
+                stmt.setString(1, "%" + busqueda + "%");
+            } else {
+                stmt = Conexion.getInstance().getConnection().prepareStatement(
+                    "SELECT * FROM producto WHERE activo = 1 AND categoria = ? AND nombre LIKE ? ORDER BY nombre");
+                stmt.setString(1, categoria);
+                stmt.setString(2, "%" + busqueda + "%");
+            }
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                productos.add(armarProducto(rs)); }
+            rs.close();
             stmt.close();
-            return filas > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false; } }
-    
-    
+            e.printStackTrace(); }
+        return productos;  }
+
+    // arma un Producto con la fila actual del ResultSet
+    private static Producto armarProducto(ResultSet rs) throws SQLException {
+        CategoriasProd categoria = null;
+        String textoCategoria = rs.getString("categoria");
+        for (CategoriasProd c : CategoriasProd.values()) {
+            if (c.name().equalsIgnoreCase(textoCategoria)) {
+                categoria = c;}  }
+        return new Producto(
+            String.valueOf(rs.getInt("id_productos")),
+            rs.getString("nombre"),
+            rs.getDouble("precio"),
+            rs.getInt("stock"),
+            categoria,
+            rs.getString("talle"));
+                  }
     
    
     

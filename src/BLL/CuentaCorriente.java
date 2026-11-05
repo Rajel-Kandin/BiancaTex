@@ -1,8 +1,11 @@
 package BLL;
 import java.time.LocalDate;
-import javax.swing.JOptionPane;
 
-import DDL.ControllerCuentaCorriente;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import DAO.CuentaCorrienteDAO;
 import repository.Validaciones;
 
 public class CuentaCorriente {
@@ -12,7 +15,7 @@ public class CuentaCorriente {
 
 	// cargar saldo inicial (solo si la cuenta está vacía)
 	public static void cargarSaldoInicial(Usuario usuario) {
-	    if (ControllerCuentaCorriente.existenMovimientos()) {
+	    if (CuentaCorrienteDAO.existenMovimientos()) {
 	        JOptionPane.showMessageDialog(null, "Ya hay un saldo  cargado. El saldo inicial solo se carga una vez.");
 	        return;  }
 
@@ -24,7 +27,7 @@ public class CuentaCorriente {
 	            "Saldo inicial", JOptionPane.YES_NO_OPTION);
 	    if (confirmacion != JOptionPane.YES_OPTION) return;
 
-	    boolean ok = ControllerCuentaCorriente.registrarMovimiento(LocalDate.now(), saldoInicial, "Saldo inicial",
+	    boolean ok = CuentaCorrienteDAO.registrarMovimiento(LocalDate.now(), saldoInicial, "Saldo inicial",
 	            usuario.getIdUsuario(), null, null);
 	    if (ok) {
 	        JOptionPane.showMessageDialog(null, "Saldo inicial cargado correctamente");
@@ -33,34 +36,41 @@ public class CuentaCorriente {
 	    }}
 
 
-	// ver movimientos (con filtros) y el saldo actual
+	// ver movimientos, filtros y el saldo actual
 	public static void verCuentaCorriente() {
-	    String[] opciones = {"Todos", "Ventas", "Compras", "Ingresos", "Egresos", "Volver"};
+	    String[] filtros = {"Todos", "Ventas", "Compras", "Ingresos", "Egresos"};
 	    String filtro = "Todos";
 	    boolean seguir = true;
 
 	    while (seguir) {
-	        String lista = ControllerCuentaCorriente.obtenerListaMovimientos(filtro);
+	        String lista = CuentaCorrienteDAO.obtenerListaMovimientos(filtro);
 
 	        if (lista.isEmpty()) {
 	            if (filtro.equals("Todos")) {
 	                JOptionPane.showMessageDialog(null, "No hay movimientos cargados");
-	                return;
-	            }
-	            lista = "No hay movimientos de este tipo. \n";  }
+	                return; }
+	            lista = "No hay movimientos de este tipo."; }
 
-	        double saldo = ControllerCuentaCorriente.obtenerSaldo();
-	        lista += "\nSALDO ACTUAL: $" + String.format("%.2f", saldo);
+	        double saldo = CuentaCorrienteDAO.obtenerSaldo();
+	        lista += "\n\nSALDO ACTUAL: $" + String.format("%.2f", saldo);
 
-	        int eleccion = JOptionPane.showOptionDialog(null, lista, "Cuenta corriente - " + filtro,
-	                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
+	        JComboBox<String> combo = new JComboBox<>(filtros);
+	        combo.setSelectedItem(filtro);
 
-	        if (eleccion == -1 || eleccion == 5) {
-	            seguir = false;
+	        // cambio de filtro abre y cierra 
+	        combo.addActionListener(e -> SwingUtilities.getWindowAncestor(combo).dispose());
+
+	        Object[] mensaje = {"Filtrar por:", combo, "\n" + lista};
+
+	        JOptionPane.showMessageDialog(null, mensaje, "Cuenta corriente - " + filtro, JOptionPane.PLAIN_MESSAGE);
+
+	        String elegido = (String) combo.getSelectedItem();
+	        if (elegido.equals(filtro)) {
+	            seguir = false;   
 	        } else {
-	            filtro = opciones[eleccion];  }  }}
+	            filtro = elegido;} }
+	                                                     }
 	
-
 	
 	// crear ingreso manual (suma al saldo)
 	public static void crearIngreso(Usuario usuario) {
@@ -82,7 +92,7 @@ public class CuentaCorriente {
 	            "Crear ingreso", JOptionPane.YES_NO_OPTION);
 	    if (confirmacion != JOptionPane.YES_OPTION) return;
 
-	    boolean ok = ControllerCuentaCorriente.registrarMovimiento(LocalDate.now(), monto,
+	    boolean ok = CuentaCorrienteDAO.registrarMovimiento(LocalDate.now(), monto,
 	            "Ingreso: " + descripcion.trim(), usuario.getIdUsuario(), null, null);
 	    if (ok) {
 	        JOptionPane.showMessageDialog(null, "Ingreso registrado correctamente");
@@ -114,7 +124,7 @@ public class CuentaCorriente {
 
 	    
 	    // monto negativo porque sale plata
-	    boolean ok = ControllerCuentaCorriente.registrarMovimiento(LocalDate.now(), -monto,
+	    boolean ok = CuentaCorrienteDAO.registrarMovimiento(LocalDate.now(), -monto,
 	            "Egreso: " + descripcion.trim(), usuario.getIdUsuario(), null, null);
 	    if (ok) {
 	        JOptionPane.showMessageDialog(null, "Egreso registrado correctamente");
@@ -126,7 +136,7 @@ public class CuentaCorriente {
 	
 	// eliminar un ingreso o egreso manual
 	public static void eliminarMovimientoManual() {
-	    String lista = ControllerCuentaCorriente.obtenerListaManuales();
+	    String lista = CuentaCorrienteDAO.obtenerListaManuales();
 	    if (lista.isEmpty()) {
 	        JOptionPane.showMessageDialog(null, "No hay ingresos ni egresos manuales cargados");
 	        return;  }
@@ -139,7 +149,7 @@ public class CuentaCorriente {
 	            "Eliminar movimiento", JOptionPane.YES_NO_OPTION);
 	    if (confirmacion != JOptionPane.YES_OPTION) return;
 
-	    boolean eliminado = ControllerCuentaCorriente.eliminarMovimientoManual(idMovimiento);
+	    boolean eliminado = CuentaCorrienteDAO.eliminarMovimientoManual(idMovimiento);
 	    if (eliminado) {
 	        JOptionPane.showMessageDialog(null, "Movimiento eliminado correctamente");
 	    } else {

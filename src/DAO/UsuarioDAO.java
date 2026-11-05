@@ -1,4 +1,4 @@
-package DDL;
+package DAO;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +12,7 @@ import BLL.Empleado;
 import BLL.Local;
 import BLL.Usuario;
 import repository.Hashing;
-public class ControllerUsuario {
+public class UsuarioDAO {
 
 	
 	//ingresar
@@ -27,13 +27,6 @@ public class ControllerUsuario {
 
 	        if (rs.next() && Hashing.verificar(password, rs.getString("password"))) {
 
-	            // email y contraseña correctos, pero está desactivado
-	            if (!rs.getBoolean("activo")) {
-	                JOptionPane.showMessageDialog(null, "Tu usuario está desactivado. Consultá con un administrador.");
-	                rs.close();
-	                stmt.close();
-	                return null; }
-
 	            int id = rs.getInt("id_usuario");
 	            String dniBd = rs.getString("dni");
 	            String nombreBd = rs.getString("nombre");
@@ -47,16 +40,47 @@ public class ControllerUsuario {
 	                Local local = obtenerLocal(rs.getInt("fk_local"));
 	                usuario = new Empleado(id, dniBd, nombreBd, emailBd, activo, local);
 	            } else if (tipo == 3) {
-	                usuario = new Contador(id, dniBd, nombreBd, emailBd, activo); }
-	        } else {
-	            JOptionPane.showMessageDialog(null, "Email o contraseña incorrectos"); }
-
+	                usuario = new Contador(id, dniBd, nombreBd, emailBd, activo); } }
 	        rs.close();
 	        stmt.close();
 	    } catch (SQLException e) {
 	        e.printStackTrace(); }
-	    return usuario; }
-	 
+	    return usuario; } 
+	
+	
+	// da true si ya hay un usuario con ese DNI
+	public static boolean existeDni(String dni) {
+		try {
+			PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
+				"SELECT id_usuario FROM usuario WHERE dni = ?");
+			stmt.setString(1, dni);
+			ResultSet rs = stmt.executeQuery();
+			boolean existe = rs.next();
+			rs.close();
+			stmt.close();
+			return existe;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;}
+	                                    }
+
+	// da true si ya hay un  usuario con ese email 
+	public static boolean existeEmail(String email, int idExcluir) {
+		try {
+			PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
+				"SELECT id_usuario FROM usuario WHERE email = ? AND id_usuario <> ?");
+			stmt.setString(1, email);
+			stmt.setInt(2, idExcluir);
+			ResultSet rs = stmt.executeQuery();
+			boolean existe = rs.next();
+			rs.close();
+			stmt.close();
+			return existe;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;}
+	                                    }
+	
     
     //obtiene el local
     private static Local obtenerLocal(int idLocal) throws SQLException {
@@ -144,7 +168,7 @@ public class ControllerUsuario {
         return usuario; }
 
     
-    // Edita los datos de un usuario existente
+    // Edita los datos de un usuario 
     public static boolean editarUsuario(int idUsuario, String dni, String nombre, String email, int tipo, Integer fkLocal) {
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
@@ -173,6 +197,7 @@ public class ControllerUsuario {
             e.printStackTrace();
             return false;}}
 
+    
     
     // desactivar (activo = 0) 
     public static boolean desactivarUsuario(int idUsuario) {
@@ -205,10 +230,9 @@ public class ControllerUsuario {
             return false; }}
     
     
-    
- // muestra los usuarios
+    // muestra los usuarios
     public static String obtenerListaUsuarios() {
-        String lista = "";
+        StringBuilder lista = new StringBuilder();
 
         String sql = "SELECT u.id_usuario, u.dni, u.nombre, u.email, t.tipo, u.fk_local, u.activo " +
                      "FROM usuario u " +
@@ -224,20 +248,19 @@ public class ControllerUsuario {
                 String local = rs.wasNull() ? "-" : String.valueOf(fkLocal);
                 String activo = rs.getBoolean("activo") ? "Sí" : "No";
 
-                lista += "ID: " + rs.getInt("id_usuario") +
-                         " | DNI: " + rs.getString("dni") +
-                         " | " + rs.getString("nombre") +
-                         " | " + rs.getString("email") +
-                         " | " + rs.getString("tipo") +
-                         " | Local: " + local +
-                         " | Activo: " + activo + "\n";
+                lista.append("ID: " + rs.getInt("id_usuario") +
+                             " | DNI: " + rs.getString("dni") +
+                             " | " + rs.getString("nombre") +
+                             " | " + rs.getString("email") +
+                             " | " + rs.getString("tipo") +
+                             " | Local: " + local +
+                             " | Activo: " + activo + "\n");
             }
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return lista; }
+            e.printStackTrace(); }
+        return lista.toString();}
    
 	
 }

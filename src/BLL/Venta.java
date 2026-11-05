@@ -2,15 +2,21 @@ package BLL;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
-import DDL.ControllerProducto;
-import DDL.ControllerVenta;
+import DAO.ProductoDAO;
+import DAO.VentaDAO;
 import repository.Validaciones;
+import java.awt.Dimension;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class Venta extends Movimiento {
 
@@ -96,8 +102,10 @@ public class Venta extends Movimiento {
         return "Venta [idVenta=" + idVenta + ", descuento=" + descuento + ", subtotal=" + subtotal + ", total=" + total  + ", usuario=" + usuario + "]";
     }
 
+    
+    //para usar en compra elegir productos 
     private static Producto seleccionarProducto() {
-        LinkedList<Producto> productos = ControllerProducto.obtenerProductos();
+        LinkedList<Producto> productos = ProductoDAO.obtenerProductos();
 
         if (productos.isEmpty()) {
             JOptionPane.showMessageDialog(null, "No hay productos cargados. Se cancela la venta");
@@ -119,7 +127,7 @@ public class Venta extends Movimiento {
         return productos.get(index); }
 
     
-    
+    //registrar venta
     public static void registrarVenta(Usuario usuario) {
         String nombreCliente = JOptionPane.showInputDialog("Nombre del cliente:");
         while (nombreCliente != null && nombreCliente.trim().isEmpty()) {
@@ -222,7 +230,7 @@ public class Venta extends Movimiento {
             return; }
 
         // guarda la venta
-        int idVenta = ControllerVenta.guardarVenta(usuario.getIdUsuario(), descuento, subtotal, total,
+        int idVenta = VentaDAO.guardarVenta(usuario.getIdUsuario(), descuento, subtotal, total,
                 nombreCliente, telefonoCliente, detalles);
 
         if (idVenta > 0) {
@@ -231,6 +239,8 @@ public class Venta extends Movimiento {
             // genera el ticket
             Ticket.generarTxt(idVenta, usuario.getNombre(), nombreCliente, telefonoCliente,
                     detalles, subtotal, descuento, total);
+            //guarda en la bd
+            VentaDAO.guardarTicket(idVenta);
         } else {
             JOptionPane.showMessageDialog(null, "Error al registrar la venta. No se guardó nada."); }
                                }
@@ -242,7 +252,7 @@ public class Venta extends Movimiento {
     public static void buscarVenta() {
         Integer idVenta = Validaciones.validarEntero("Ingrese el ID de la venta a buscar:");
         if (idVenta == null) return;
-        String info = ControllerVenta.obtenerVenta(idVenta);
+        String info = VentaDAO.obtenerVenta(idVenta);
 
         if (info == null) {
             JOptionPane.showMessageDialog(null, "No existe una venta con ese ID.");
@@ -256,7 +266,7 @@ public class Venta extends Movimiento {
         Integer idVenta = Validaciones.validarEntero("Ingrese el ID de la venta a eliminar:");
         if (idVenta == null) return;
 
-        String info = ControllerVenta.obtenerVenta(idVenta);
+        String info = VentaDAO.obtenerVenta(idVenta);
 
         if (info == null) {
             JOptionPane.showMessageDialog(null, "No existe una venta con ese ID.");
@@ -267,7 +277,7 @@ public class Venta extends Movimiento {
                 "Eliminar venta", JOptionPane.YES_NO_OPTION);
 
         if (resp == JOptionPane.YES_OPTION) {
-            if (ControllerVenta.eliminarVenta(idVenta)) {
+            if (VentaDAO.eliminarVenta(idVenta)) {
 
                 // borro el ticket de esa venta para que no quede como válido
                 File ticket = new File("tickets", "ticket_" + idVenta + ".txt");
@@ -277,12 +287,61 @@ public class Venta extends Movimiento {
                 JOptionPane.showMessageDialog(null, "Venta eliminada, stock devuelto y ticket borrado.");
             } else {
                 JOptionPane.showMessageDialog(null, "Error al eliminar la venta. No se modificó nada.");}}}
-     
-    
 
-    //ver ventas
+    
+    //ver ventas con filtro por fecha
     public static void verVentas() {
-        JOptionPane.showMessageDialog(null, ControllerVenta.listarVentas()); }
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaTexto = "";
+        boolean seguir = true;
+
+        while (seguir) {
+            LocalDate fecha = null;
+            if (!fechaTexto.isEmpty()) {
+                try {
+                    fecha = LocalDate.parse(fechaTexto, formato);
+                } catch (DateTimeParseException e) {
+                    JOptionPane.showMessageDialog(null, "Fecha inválida. Usá el formato dd/mm/aaaa.");
+                    fechaTexto = ""; } }
+
+            String lista = VentaDAO.listarVentas(fecha);
+
+            if (lista.isEmpty()) {
+                if (fecha == null) {
+                    JOptionPane.showMessageDialog(null, "No hay ventas registradas");
+                    return; }
+                lista = "No hay ventas en esa fecha."; }
+
+            JTextField inpFecha = new JTextField(fechaTexto);
+
+            JTextArea areaLista = new JTextArea(lista);
+            areaLista.setEditable(false);
+            areaLista.setCaretPosition(0);
+            JScrollPane scroll = new JScrollPane(areaLista);
+            scroll.setPreferredSize(new Dimension(600, 350));
+
+            Object[] mensaje = {"Filtrar por fecha:", inpFecha, " ", scroll};
+
+            String titulo = "Ventas - ";
+            if (fecha == null) {
+                titulo += "Todas";
+            } else {
+                titulo += fechaTexto; }
+
+            int opcion = JOptionPane.showConfirmDialog(null, mensaje, titulo,
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            String nuevaFecha = inpFecha.getText().trim();
+
+            if (opcion != JOptionPane.OK_OPTION) {
+                seguir = false;
+            } else if (!nuevaFecha.equals(fechaTexto)) {
+                fechaTexto = nuevaFecha;
+            } else if (!fechaTexto.isEmpty()) {
+                fechaTexto = "";
+            } else {
+                seguir = false; } }
+                                   }
     
     
     //ver tickets 
@@ -309,18 +368,17 @@ public class Venta extends Movimiento {
         if (elegido == null) {
             return;  }
 
-        String contenido = "";
+        StringBuilder contenido = new StringBuilder();
         try {
             Scanner lector = new Scanner(new File(carpeta, elegido));
             while (lector.hasNextLine()) {
-                contenido += lector.nextLine() + "\n";
-            }
+                contenido.append(lector.nextLine() + "\n");  }
             lector.close();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "No se pudo abrir el ticket.");
             return; }
-
-        JOptionPane.showMessageDialog(null, contenido, elegido, JOptionPane.INFORMATION_MESSAGE); }
+        JOptionPane.showMessageDialog(null, contenido.toString(), elegido, JOptionPane.INFORMATION_MESSAGE); 
+                                }
     
     
     //obtener nombres de los tickets
@@ -337,15 +395,15 @@ public class Venta extends Movimiento {
     
     //leer el contenido de un ticket
     public static String leerTicket(String nombreArchivo) {
-        String contenido = "";
+        StringBuilder contenido = new StringBuilder();
         try {
             Scanner lector = new Scanner(new File("tickets", nombreArchivo));
             while (lector.hasNextLine()) {
-                contenido += lector.nextLine() + "\n"; }
+                contenido.append(lector.nextLine() + "\n"); }
             lector.close();
-             } catch (Exception e) {
-            contenido = "No se pudo abrir el ticket.";}
-            return contenido; }
+        } catch (Exception e) {
+            return "No se pudo abrir el ticket.";}
+        return contenido.toString(); }
     
     
              }

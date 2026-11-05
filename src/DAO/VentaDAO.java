@@ -1,5 +1,7 @@
-package DDL;
+package DAO;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -11,7 +13,7 @@ import java.util.LinkedList;
 
 import BLL.DetalleVenta;
 
-public class ControllerVenta {
+public class VentaDAO {
 
     // guarda venta, el detalle y descuenta stock. Devuelve el id de la venta (0 si falló)
     public static int guardarVenta(int idUsuario, double descuento, double subtotal, double total,
@@ -91,7 +93,7 @@ public class ControllerVenta {
                 ex.printStackTrace();}}}
 
 
-    // devuelve el texto de una venta con su detalle 
+ // muestra  la compra de una venta con toda la info (datos, productos y totales)
     public static String obtenerVenta(int idVenta) {
         String texto = null;
         try {
@@ -104,12 +106,13 @@ public class ControllerVenta {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                texto = "VENTA #" + idVenta +
+                StringBuilder sb = new StringBuilder();
+                sb.append("VENTA #" + idVenta +
                         "\nFecha: " + rs.getDate("fecha") +
                         "\nRegistrada por: " + rs.getString("nombre") +
                         "\nCliente: " + rs.getString("nombre_cliente") +
                         "\nTeléfono: " + rs.getString("telefono_cliente") +
-                        "\n\nProductos:\n";
+                        "\n\nProductos:\n");
 
                 PreparedStatement psDet = con.prepareStatement(
                     "SELECT p.nombre, p.talle, d.cantidad, d.precio_uni, d.subTotal_item " +
@@ -118,64 +121,73 @@ public class ControllerVenta {
                 psDet.setInt(1, idVenta);
                 ResultSet rsDet = psDet.executeQuery();
                 while (rsDet.next()) {
-                    texto += "- " + rsDet.getString("nombre") + " (" + rsDet.getString("talle") + ") x"
+                    sb.append("- " + rsDet.getString("nombre") + " (" + rsDet.getString("talle") + ") x"
                             + rsDet.getInt("cantidad") + " a $" + rsDet.getDouble("precio_uni")
-                            + " = $" + rsDet.getDouble("subTotal_item") + "\n";
+                            + " = $" + rsDet.getDouble("subTotal_item") + "\n");
                 }
                 rsDet.close();
                 psDet.close();
 
-                texto += "\nSubtotal: $" + rs.getDouble("subTotal") +
+                sb.append("\nSubtotal: $" + rs.getDouble("subTotal") +
                          "\nDescuento: " + rs.getDouble("descuento") + "%" +
-                         "\nTOTAL: $" + rs.getDouble("total");
-            }
+                         "\nTOTAL: $" + rs.getDouble("total"));
+
+                texto = sb.toString();  }
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
         return texto; }
+    
+    
 
-
-    // lista de todas las ventas
+ // lista de todas las ventas
     public static String listarVentas() {
-        String lista = "";
+        String lista = listarVentas(null);
+        if (lista.equals("")) {
+            lista = "No hay ventas registradas."; }
+        return lista; }
+
+
+    public static String listarVentas(LocalDate fecha) {
+        StringBuilder lista = new StringBuilder();
         try {
-            PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
-                "SELECT venta.id_venta, venta.fecha, venta.subTotal, venta.descuento, venta.total, " +
-                "venta.nombre_cliente, venta.telefono_cliente, " +
-                "usuario.nombre AS usuario_nombre " +
-                "FROM venta " +
-                "INNER JOIN usuario ON venta.fk_usuario = usuario.id_usuario " +
-                "ORDER BY venta.fecha DESC");
+            String consulta = "SELECT venta.id_venta, venta.fecha, venta.subTotal, venta.descuento, venta.total, " +
+                              "venta.nombre_cliente, venta.telefono_cliente, " +
+                              "usuario.nombre AS usuario_nombre " +
+                              "FROM venta " +
+                              "INNER JOIN usuario ON venta.fk_usuario = usuario.id_usuario ";
+            if (fecha != null) {
+                consulta += "WHERE DATE(venta.fecha) = ? "; }
+
+            consulta += "ORDER BY venta.fecha DESC";
+            PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(consulta);
+
+            if (fecha != null) {
+                stmt.setDate(1, java.sql.Date.valueOf(fecha)); }
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 int idVenta = rs.getInt("id_venta");
-                lista += "Venta #" + idVenta +
+                lista.append("Venta #" + idVenta +
                          " | Fecha: " + rs.getDate("fecha") +
                          " | Registrada por: " + rs.getString("usuario_nombre") +
                          " | Cliente: " + rs.getString("nombre_cliente") +
                          " | Subtotal: $" + rs.getDouble("subTotal") +
                          " | Descuento: " + rs.getDouble("descuento") + "%" +
-                         " | Total cobrado: $" + rs.getDouble("total") + "\n";
-                lista += obtenerDetalleVenta(idVenta);
-                lista += "----------------------------------------\n"; }
-
+                         " | Total cobrado: $" + rs.getDouble("total") + "\n");
+                lista.append(obtenerDetalleVenta(idVenta));
+                lista.append(" \n\n"); }
             rs.close();
             stmt.close();
         } catch (SQLException e) {
             e.printStackTrace(); }
-
-        if (lista.equals("")) {
-            lista = "No hay ventas registradas."; }
-        return lista; }
+        return lista.toString(); }
     
     
-    
-    // detalle de productos de una venta
+ // muestra el detalle  de la venta
     public static String obtenerDetalleVenta(int idVenta) {
-        String detalle = "";
+        StringBuilder detalle = new StringBuilder();
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
                 "SELECT producto.nombre, producto.talle, detalleVenta.cantidad, " +
@@ -187,16 +199,16 @@ public class ControllerVenta {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                detalle += "   - " + rs.getString("nombre") +
+                detalle.append("   - " + rs.getString("nombre") +
                            " (talle " + rs.getString("talle") + ")" +
                            " x" + rs.getInt("cantidad") +
                            " | $" + rs.getDouble("precio_uni") + " c/u" +
-                           " | Subtotal: $" + rs.getDouble("subTotal_item") + "\n"; }
+                           " | Subtotal: $" + rs.getDouble("subTotal_item") + "\n"); }
             rs.close();
             stmt.close();
         } catch (SQLException e) {
             e.printStackTrace(); }
-        return detalle; }
+        return detalle.toString(); }
 
 
 
@@ -255,6 +267,20 @@ public class ControllerVenta {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }} }
+    
+    
+ // guarda el ticket en la venta
+    public static void guardarTicket(int idVenta) {
+        try {
+            byte[] bytes = Files.readAllBytes(new File("tickets", "ticket_" + idVenta + ".txt").toPath());
+            PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
+                "UPDATE venta SET ticket = ? WHERE id_venta = ?");
+            stmt.setBytes(1, bytes);
+            stmt.setInt(2, idVenta);
+            stmt.executeUpdate();
+            stmt.close();
+        } catch (Exception e) {
+            e.printStackTrace(); } }
 
 
 }

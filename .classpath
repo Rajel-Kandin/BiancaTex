@@ -6,7 +6,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/rajel/Desktop/Universidad/Workspace ecplise/Conexion/mysql-connector-java-5.1.13.jar"/>
-	<classpathentry kind="lib" path="C:/Users/rajel/Desktop/Universidad/Workspace ecplise/jbcrypt-0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/rajel/Desktop/Universidad/Workspace ecplise/jbcrypt-0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/rajel/Desktop/Universidad/Workspace ecplise/Conexion/mysql-connector-j-9.6.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/rajel/Desktop/Universidad/Workspace ecplise/flatlaf-3.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

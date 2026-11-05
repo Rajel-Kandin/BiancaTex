@@ -1,24 +1,26 @@
 package GUI;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+
+import com.formdev.flatlaf.FlatLightLaf;
 
 import BLL.Admin;
 import BLL.Contador;
 import BLL.Empleado;
 import BLL.Usuario;
-import DDL.ControllerUsuario;
-
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JPasswordField;
-import java.awt.Color;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import DAO.UsuarioDAO;
 
 public class InterfazLogin extends JFrame {
 
@@ -29,14 +31,18 @@ public class InterfazLogin extends JFrame {
 	private JLabel lblMensaje;
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					InterfazLogin frame = new InterfazLogin();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		EventQueue.invokeLater(() -> {
+			try {
+				FlatLightLaf.setup();
+				UIManager.put("defaultFont", new Font("Segoe UI", Font.PLAIN, 14));
+				UIManager.put("Button.arc", 12);
+				UIManager.put("Component.arc", 12);
+				UIManager.put("TextComponent.arc", 12);
+
+				InterfazLogin frame = new InterfazLogin();
+				frame.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 	}
@@ -44,75 +50,87 @@ public class InterfazLogin extends JFrame {
 	public InterfazLogin() {
 		setTitle("BiancaTex - Login");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 320);
+		setLocationRelativeTo(null);
+		setResizable(false);
+
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
 		JLabel lblTitulo = new JLabel("BIANCATEX - LOGIN");
-		lblTitulo.setBounds(160, 15, 150, 20);
+		lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+		lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTitulo.setBounds(0, 20, 434, 25);
 		contentPane.add(lblTitulo);
 
 		JLabel lblEmail = new JLabel("Email:");
-		lblEmail.setBounds(110, 50, 100, 15);
+		lblEmail.setBounds(107, 60, 220, 20);
 		contentPane.add(lblEmail);
 
 		inpEmail = new JTextField();
-		inpEmail.setBounds(110, 70, 220, 22);
+		inpEmail.setBounds(107, 82, 220, 28);
 		contentPane.add(inpEmail);
-		inpEmail.setColumns(10);
 
 		JLabel lblPassword = new JLabel("Contraseña:");
-		lblPassword.setBounds(110, 105, 100, 15);
+		lblPassword.setBounds(107, 120, 220, 20);
 		contentPane.add(lblPassword);
 
 		inpPassword = new JPasswordField();
-		inpPassword.setBounds(110, 125, 220, 22);
+		inpPassword.setBounds(107, 142, 220, 28);
 		contentPane.add(inpPassword);
 
 		lblMensaje = new JLabel("");
 		lblMensaje.setForeground(Color.RED);
-		lblMensaje.setBounds(110, 155, 250, 15);
+		lblMensaje.setHorizontalAlignment(SwingConstants.CENTER);
+		lblMensaje.setBounds(0, 180, 434, 20);
 		contentPane.add(lblMensaje);
 
 		JButton btnLogin = new JButton("Ingresar");
-		btnLogin.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btnLogin.setBounds(162, 210, 110, 32);
+		btnLogin.addActionListener(e -> ingresar());
+		contentPane.add(btnLogin);
 
-				String email = inpEmail.getText().trim().toLowerCase();
-				String password = new String(inpPassword.getPassword());
+		getRootPane().setDefaultButton(btnLogin); // Enter Ingresa
+	}
 
-				if (email.isEmpty() || password.trim().isEmpty()) {
-					lblMensaje.setText("Completá email y contraseña.");
-					return;}
+	private void ingresar() {
+		String email = inpEmail.getText().trim().toLowerCase();
+		String password = new String(inpPassword.getPassword());
 
-				if (!email.matches("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)+$")) {
-					lblMensaje.setText("Ingresá un email válido.");
-					return;}
+		if (email.isEmpty() || password.trim().isEmpty()) {
+			lblMensaje.setText("Completá email y contraseña.");
+			return;
+		}
 
-				Usuario logueado = ControllerUsuario.login(email, password);
+		if (!email.matches("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)+$")) {
+			lblMensaje.setText("Ingresá un email válido.");
+			return;
+		}
 
-				if (logueado == null) {
-					lblMensaje.setText("Email o contraseña incorrectos.");
-					inpPassword.setText("");
-				} else if (!logueado.getActivo()) {
-					lblMensaje.setText("Tu usuario está desactivado.");
-					inpPassword.setText("");
-				} else {
-					if (logueado instanceof Admin) {
-						InterfazAdmin menu = new InterfazAdmin((Admin) logueado);
-						menu.setVisible(true);
-					} else if (logueado instanceof Empleado) {
-						InterfazEmpleado menu = new InterfazEmpleado((Empleado) logueado);
-						menu.setVisible(true);
-					} else {
-						InterfazContador menu = new InterfazContador((Contador) logueado);
-						menu.setVisible(true);}
+		Usuario logueado = UsuarioDAO.login(email, password);
 
-					dispose();}}
-		});
+		if (logueado == null) {
+			lblMensaje.setText("Email o contraseña incorrectos.");
+			inpPassword.setText("");
+			return;
+		}
 
-		btnLogin.setBounds(160, 185, 110, 25);
-		contentPane.add(btnLogin);}
+		if (!logueado.getActivo()) {
+			lblMensaje.setText("Tu usuario está desactivado.");
+			inpPassword.setText("");
+			return;
+		}
+
+		if (logueado instanceof Admin) {
+			new InterfazAdmin((Admin) logueado).setVisible(true);
+		} else if (logueado instanceof Empleado) {
+			new InterfazEmpleado((Empleado) logueado).setVisible(true);
+		} else if (logueado instanceof Contador) {
+			new InterfazContador((Contador) logueado).setVisible(true);
+		}
+
+		dispose();
+	}
 }

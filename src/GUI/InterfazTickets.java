@@ -42,14 +42,14 @@ public class InterfazTickets extends JFrame {
 		lblTitulo.setBounds(20, 15, 200, 20);
 		contentPane.add(lblTitulo);
 
-		// tabla con los nombres de los tickets
+		//  nombres de los tickets
 		model = new DefaultTableModel(new String[]{"Ticket"}, 0);
 		tablaTickets = new JTable(model);
 		JScrollPane scrollTabla = new JScrollPane(tablaTickets);
 		scrollTabla.setBounds(20, 45, 140, 330);
 		contentPane.add(scrollTabla);
 
-		// espacio  donde se muestra el contenido del ticket
+		// espacio  donde se muestra el texto del ticket
 		txtContenido = new JTextArea();
 		txtContenido.setEditable(false);
 		txtContenido.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -72,7 +72,7 @@ public class InterfazTickets extends JFrame {
 		btnVolver.setBounds(560, 385, 100, 25);
 		contentPane.add(btnVolver);
 
-		// cuando se selecciona una fila, se muestra el ticket
+		// cselecciona un ticket y lo muestra
 		tablaTickets.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				int row = tablaTickets.getSelectedRow();

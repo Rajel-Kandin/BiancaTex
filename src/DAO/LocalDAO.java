@@ -1,4 +1,4 @@
-package DDL;
+package DAO;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 import BLL.Local;
 
-public class ControllerLocal {
+public class LocalDAO {
 
     // trae los locales activos
     public static LinkedList<Local> obtenerLocales() {
@@ -23,8 +23,7 @@ public class ControllerLocal {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
         return locales;
     }
     
@@ -43,11 +42,11 @@ public class ControllerLocal {
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
         return local; }
 
-    
+
+    //crear
     public static boolean crearLocal(String direccion) {
         boolean exito = false;
         try {
@@ -58,11 +57,10 @@ public class ControllerLocal {
             exito = stmt.executeUpdate() > 0;
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace(); }
         return exito;}
     
-
+    //editar
     public static boolean editarLocal(Local local) {
         boolean exito = false;
         try {

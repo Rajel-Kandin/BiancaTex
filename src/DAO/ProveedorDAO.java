@@ -1,4 +1,4 @@
-package DDL;
+package DAO;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 
 import BLL.Proveedor;
 
-public class ControllerProveedor {
+public class ProveedorDAO {
 
     // crea proveedor
     public static boolean crearProveedor(String cuit, String nombre, String direccion, String telefono) {
@@ -32,6 +32,21 @@ public class ControllerProveedor {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;  } }
+    
+	// da true si ya hay un proveedor con ese CUIT
+	public static boolean existeCuit(String cuit) {
+		try {
+			PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
+				"SELECT cuit FROM proveedor WHERE cuit = ?");
+			stmt.setString(1, cuit);
+			ResultSet rs = stmt.executeQuery();
+			boolean existe = rs.next();
+			rs.close();
+			stmt.close();
+			return existe;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;}}
 
 
     // Busca proveedor por CUIT 
@@ -98,10 +113,9 @@ public class ControllerProveedor {
                                       }
     
     
-    // muestra los proveedores activos
+ // trae lista de proveedores activos
     public static String obtenerListaProveedores() {
-        String lista = "";
-
+        StringBuilder lista = new StringBuilder();
         try {
             PreparedStatement stmt = Conexion.getInstance().getConnection().prepareStatement(
                 "SELECT * FROM proveedor WHERE activo = 1 ORDER BY nombre"
@@ -109,18 +123,17 @@ public class ControllerProveedor {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                lista += "CUIT: " + rs.getString("cuit") +
-                         " | " + rs.getString("nombre") +
-                         " | Dirección: " + rs.getString("direccion") +
-                         " | Tel: " + rs.getString("telefono") + "\n";
+                lista.append("CUIT: " + rs.getString("cuit") +
+                             " | " + rs.getString("nombre") +
+                             " | Dirección: " + rs.getString("direccion") +
+                             " | Tel: " + rs.getString("telefono") + "\n");
             }
             rs.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return lista;
-    }
+            e.printStackTrace(); }
+        return lista.toString();
+                                           }
 
 
     // trae los proveedores 

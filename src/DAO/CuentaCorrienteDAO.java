@@ -1,4 +1,4 @@
-package DDL;
+package DAO;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Types;
 import java.time.LocalDate;
 
-public class ControllerCuentaCorriente {
+public class CuentaCorrienteDAO {
 
     // guarda un movimiento 
     public static boolean registrarMovimiento(LocalDate fecha, double monto, String descripcion, int idUsuario,
@@ -63,9 +63,9 @@ public class ControllerCuentaCorriente {
         return 0;}
     
 
-    // muestra los movimientos filtrando: Todos, Ventas, Compras, Ingresos, Egresos
+ // lista de movimientos de cc  con  filtros 
     public static String obtenerListaMovimientos(String filtro) {
-        String texto = "";
+        StringBuilder texto = new StringBuilder();
         double saldo = 0;
         double total = 0;
 
@@ -102,8 +102,7 @@ public class ControllerCuentaCorriente {
                 } else if (rs.getObject("fk_compra") != null) {
                     tipo = "Compra #" + rs.getInt("fk_compra");
                 } else {
-                    tipo = rs.getString("descripcion");
-                }
+                    tipo = rs.getString("descripcion"); }
 
                 String montoTexto;
                 if (monto >= 0) {
@@ -111,36 +110,24 @@ public class ControllerCuentaCorriente {
                 } else {
                     montoTexto = "-$" + String.format("%.2f", -monto);}
 
-                texto += rs.getDate("fecha") + "  |  " + tipo + "  |  " + montoTexto;
+                texto.append(rs.getDate("fecha") + "  |  " + tipo + "  |  " + montoTexto);
                 if (filtro.equals("Todos")) {
-                    texto += "  |  Saldo: $" + String.format("%.2f", saldo); }
-                texto += "\n";}
+                    texto.append("  |  Saldo: $" + String.format("%.2f", saldo)); }
+                texto.append("\n");}
 
-            if (!texto.isEmpty() && !filtro.equals("Todos")) {
-                texto += "\n TOTAL " + filtro.toUpperCase() + ": $" + String.format("%.2f", Math.abs(total));
-            }
+            if (texto.length() > 0 && !filtro.equals("Todos")) {
+                texto.append("\n TOTAL " + filtro.toUpperCase() + ": $" + String.format("%.2f", Math.abs(total)));}
         } catch (Exception e) {
             e.printStackTrace();}
-        return texto; }
+        return texto.toString(); }
     
-
-    // borra el movimiento de una compra 
-    public static boolean eliminarMovimientoCompra(int idCompra) {
-        try {
-            Connection con = Conexion.getInstance().getConnection();
-            PreparedStatement stmt = con.prepareStatement("DELETE FROM cuentacorriente WHERE fk_compra = ?");
-            stmt.setInt(1, idCompra);
-            stmt.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false; }}
+    
 
     
     
     // muestra solo los ingresos y egresos manuales 
     public static String obtenerListaManuales() {
-        String texto = "";
+        StringBuilder texto = new StringBuilder();
         try {
             Connection con = Conexion.getInstance().getConnection();
             PreparedStatement stmt = con.prepareStatement(
@@ -156,11 +143,11 @@ public class ControllerCuentaCorriente {
                 } else {
                     montoTexto = "-$" + String.format("%.2f", -monto); }
 
-                texto += "#" + rs.getInt("id_movimiento") + "  |  " + rs.getDate("fecha") + "  |  "
-                        + rs.getString("descripcion") + "  |  " + montoTexto + "\n"; }
+                texto.append("#" + rs.getInt("id_movimiento") + "  |  " + rs.getDate("fecha") + "  |  "
+                        + rs.getString("descripcion") + "  |  " + montoTexto + "\n"); }
         } catch (Exception e) {
             e.printStackTrace();  }
-        return texto;   }
+        return texto.toString();   }
 
     
     

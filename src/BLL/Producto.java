@@ -1,8 +1,14 @@
 package BLL;
 
-import javax.swing.JOptionPane;
+import java.awt.Dimension;
 
-import DDL.ControllerProducto;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+import DAO.ProductoDAO;
 import repository.Validaciones;
 
 public class Producto {
@@ -107,21 +113,17 @@ public class Producto {
 	    if (nombre == null) return;
 	    Double precio = Validaciones.validarDouble("Precio:");
 	    if (precio == null) return;
-	    String stockTexto = Validaciones.validarNumeros("Stock inicial:");
-	    if (stockTexto == null) return;
-	    if (stockTexto.length() > 9) {
-	        JOptionPane.showMessageDialog(null, "El stock es demasiado grande."); return; }
-	    int stock = Integer.parseInt(stockTexto);
+	    Integer stock = Validaciones.validarEnteroCero("Stock inicial:");
+	    if (stock == null) return;
 	    String talle = Validaciones.validarLetras("Talle:");
 	    if (talle == null) return;
 	    CategoriasProd categoria = CategoriasProd.ElegirCategoria();
 	    if (categoria == null) return;
 
-	    boolean creado = ControllerProducto.crearProducto(nombre, precio, stock, categoria, talle);
+	    boolean creado = ProductoDAO.crearProducto(nombre, precio, stock, categoria, talle);
 	    if (creado) {
-	        JOptionPane.showMessageDialog(null, "Producto creado correctamente");
-	    }
-	}
+	        JOptionPane.showMessageDialog(null, "Producto creado correctamente"); }
+	                                 }
 
 
 	// buscar producto
@@ -129,7 +131,7 @@ public class Producto {
 	    String id = Validaciones.validarNumeros("Código del producto a buscar:");
 	    if (id == null) return;
 
-	    Producto p = ControllerProducto.buscarProductoPorId(id);
+	    Producto p = ProductoDAO.buscarProductoPorId(id);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún producto con ese código");
 	        return;
@@ -149,31 +151,25 @@ public class Producto {
 	    String id = Validaciones.validarNumeros("Código del producto a editar:");
 	    if (id == null) return;
 
-	    Producto p = ControllerProducto.buscarProductoPorId(id);
+	    Producto p = ProductoDAO.buscarProductoPorId(id);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún producto con ese código");
 	        return; }
-
-
 	    String nuevoNombre = Validaciones.validarLetras("Nombre del producto:", p.getNombre());
 	    if (nuevoNombre == null) return;
 	    Double nuevoPrecio = Validaciones.validarDouble("Precio:", String.valueOf(p.getPrecio()));
 	    if (nuevoPrecio == null) return;
-	    String stockTexto = Validaciones.validarNumeros("Stock:", String.valueOf(p.getStockActual()));
-	    if (stockTexto == null) return;
-	    if (stockTexto.length() > 9) {
-	        JOptionPane.showMessageDialog(null, "El stock es demasiado grande.");
-	        return; }
-	    int nuevoStock = Integer.parseInt(stockTexto);
+	    Integer nuevoStock = Validaciones.validarEnteroCero("Stock:", String.valueOf(p.getStockActual()));
+	    if (nuevoStock == null) return;
 	    String nuevoTalle = Validaciones.validarLetras("Talle:", p.getTalle());
 	    if (nuevoTalle == null) return;
 	    CategoriasProd nuevaCategoria = CategoriasProd.ElegirCategoria(p.getCategoria());
 	    if (nuevaCategoria == null) return;
 
-	    boolean editado = ControllerProducto.editarProducto(id, nuevoNombre, nuevoPrecio, nuevoStock, nuevaCategoria, nuevoTalle);
+	    boolean editado = ProductoDAO.editarProducto(id, nuevoNombre, nuevoPrecio, nuevoStock, nuevaCategoria, nuevoTalle);
 	    if (editado) {
 	        JOptionPane.showMessageDialog(null, "Producto editado correctamente");}
-	                    }
+	    }
 
 	
 	
@@ -184,7 +180,7 @@ public class Producto {
 	    String id = Validaciones.validarNumeros("Código del producto a eliminar:");
 	    if (id == null) return;
 
-	    Producto p = ControllerProducto.buscarProductoPorId(id);
+	    Producto p = ProductoDAO.buscarProductoPorId(id);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún producto con ese código");
 	        return;}
@@ -194,33 +190,80 @@ public class Producto {
 	            "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
 
 	    if (confirmacion == JOptionPane.YES_OPTION) {
-	        boolean eliminado = ControllerProducto.desactivarProducto(id);
+	        boolean eliminado = ProductoDAO.desactivarProducto(id);
 	        if (eliminado) {
 	            JOptionPane.showMessageDialog(null, "Producto eliminado correctamente"); } }
 	}
 
 
-	// ver productos
+	// ver productos, filtros y búsqueda
 	public static void verProductos() {
-	    String lista = ControllerProducto.obtenerListaProductos();
-	    if (lista.isEmpty()) {
-	        JOptionPane.showMessageDialog(null, "No hay productos cargados");
-	        return;
-	    }
-	    JOptionPane.showMessageDialog(null, lista, "Productos", JOptionPane.PLAIN_MESSAGE);
+	    CategoriasProd[] categorias = CategoriasProd.values();
+	    String[] filtros = new String[categorias.length + 1];
+	    filtros[0] = "Todas";
+	    for (int i = 0; i < categorias.length; i++) {
+	        filtros[i + 1] = categorias[i].name(); }
+
+	    String filtro = "Todas";
+	    String busqueda = "";
+	    boolean seguir = true;
+
+	    while (seguir) {
+	        String lista = ProductoDAO.obtenerListaProductos(filtro, busqueda);
+
+	        if (lista.isEmpty()) {
+	            if (filtro.equals("Todas") && busqueda.isEmpty()) {
+	                JOptionPane.showMessageDialog(null, "No hay productos cargados");
+	                return; }
+	            lista = "No se encontraron productos."; }
+
+	        JComboBox<String> combo = new JComboBox<>(filtros);
+	        combo.setSelectedItem(filtro);
+	        JTextField campoBusqueda = new JTextField(busqueda);
+
+	        JTextArea areaLista = new JTextArea(lista);
+	        areaLista.setEditable(false);
+	        areaLista.setCaretPosition(0);
+	        JScrollPane scroll = new JScrollPane(areaLista);
+	        scroll.setPreferredSize(new Dimension(600, 350));
+
+	        Object[] mensaje = {"Categoría:", combo, "Buscar por nombre:", campoBusqueda, " ", scroll};
+
+	        int opcion = JOptionPane.showConfirmDialog(null, mensaje, "Productos - " + filtro,
+	                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+	        String nuevoFiltro = (String) combo.getSelectedItem();
+	        String nuevaBusqueda = campoBusqueda.getText().trim();
+
+	        if (opcion != JOptionPane.OK_OPTION) {
+	            seguir = false;
+	        } else if (!nuevoFiltro.equals(filtro) || !nuevaBusqueda.equals(busqueda)) {
+	            filtro = nuevoFiltro;
+	            busqueda = nuevaBusqueda;
+	        } else if (!filtro.equals("Todas") || !busqueda.isEmpty()) {
+	            filtro = "Todas";
+	            busqueda = "";
+	        } else {
+	            seguir = false; } }
 	}
 
 
 	// ver bajo stock
 	public static void verBajoStock() {
-	    String lista = ControllerProducto.obtenerListaBajoStock();
+	    String lista = ProductoDAO.obtenerListaBajoStock();
 	    if (lista.isEmpty()) {
 	        JOptionPane.showMessageDialog(null, "No hay productos con bajo stock");
 	        return;
 	    }
-	    JOptionPane.showMessageDialog(null, lista, "Bajo stock (menos de 20 unidades)", JOptionPane.PLAIN_MESSAGE);
-	}
 
+	    JTextArea areaLista = new JTextArea(lista);
+	    areaLista.setEditable(false);
+	    areaLista.setCaretPosition(0);
+	    JScrollPane scroll = new JScrollPane(areaLista);
+	    scroll.setPreferredSize(new Dimension(600, 350));
+
+	    JOptionPane.showMessageDialog(null, scroll, "Bajo stock (menos de 20 unidades)", JOptionPane.PLAIN_MESSAGE);
+	}
 
 
 	

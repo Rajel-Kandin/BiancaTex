@@ -3,7 +3,7 @@ package GUI;
 import javax.swing.JOptionPane;
 
 import BLL.Usuario;
-import DDL.ControllerUsuario;
+import DAO.UsuarioDAO;
 import repository.Validaciones;
 
 public class main {
@@ -32,7 +32,7 @@ public class main {
                         JOptionPane.showMessageDialog(null, "La contraseña no puede estar vacía.");
                         break; }
 
-                    Usuario usuarioLogueado = ControllerUsuario.login(emailIngresado, passwordIngresada);
+                    Usuario usuarioLogueado = UsuarioDAO.login(emailIngresado, passwordIngresada);
                     if (usuarioLogueado != null) {
                         usuarioLogueado.verMenu(); }
                     break; }
