@@ -19,4 +19,10 @@ public enum CategoriasProd {
 		return opcion;
 	}
 	
+	public static CategoriasProd CrearCategoria() {
+		
+		return null;
+	
+	}
+	
 }

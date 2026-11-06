@@ -246,14 +246,14 @@ public class Compra extends Movimiento {
 			JOptionPane.showMessageDialog(null, "No se encontró ninguna compra con ese número");
 			return;}
 
-		// izquierda muestra datos de la compra 
+		// en lado izquierdo: muestra datos de la compra 
 		JTextArea txtInfo = new JTextArea(texto.replace(" | ", "\n"));
 		txtInfo.setEditable(false);
 		txtInfo.setLineWrap(true);
 		txtInfo.setWrapStyleWord(true);
 		JScrollPane scroll = new JScrollPane(txtInfo);
 
-		// derecha esta la foto 
+		// del lado derecho:  esta la foto 
 		JLabel lblFactura = new JLabel();
 		lblFactura.setHorizontalAlignment(JLabel.CENTER);
 		mostrarImagen(lblFactura, CompraDAO.obtenerFactura(idCompra));
@@ -268,7 +268,7 @@ public class Compra extends Movimiento {
 	}
 
 
-	// pone la imagen en el label achicada
+	// redimensiona la imagen
 	private static void mostrarImagen(JLabel lbl, byte[] imagenBytes) {
 		if (imagenBytes != null && imagenBytes.length > 0) {
 			ImageIcon icon = new ImageIcon(imagenBytes);
@@ -278,8 +278,7 @@ public class Compra extends Movimiento {
 				double escala = Math.min(330.0 / ancho, 330.0 / alto);
 				Image img = icon.getImage().getScaledInstance((int) (ancho * escala), (int) (alto * escala), Image.SCALE_SMOOTH);
 				lbl.setIcon(new ImageIcon(img));
-				return;}
-		}
+				return;}}
 		lbl.setIcon(null);
 		lbl.setText("Sin factura");
 	}

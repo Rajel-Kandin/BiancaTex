@@ -100,13 +100,13 @@ public class InterfazLogin extends JFrame {
 		String password = new String(inpPassword.getPassword());
 
 		if (email.isEmpty() || password.trim().isEmpty()) {
-			lblMensaje.setText("Completá email y contraseña.");
-			return;
+		    lblMensaje.setText("Completá email y contraseña.");
+		    return;
 		}
 
-		if (!email.matches("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)+$")) {
-			lblMensaje.setText("Ingresá un email válido.");
-			return;
+		if (!email.matches("^[\\w+-]+(\\.[\\w+-]+)*@biancatex\\.com$")) {
+		    lblMensaje.setText("El email debe ser de la empresa");
+		    return;
 		}
 
 		Usuario logueado = UsuarioDAO.login(email, password);
@@ -130,7 +130,6 @@ public class InterfazLogin extends JFrame {
 		} else if (logueado instanceof Contador) {
 			new InterfazContador((Contador) logueado).setVisible(true);
 		}
-
-		dispose();
-	}
+		dispose();}
+	
 }

@@ -149,11 +149,11 @@ public class Validaciones {
 	public static boolean esCuitValido(String cuit) {
 		return cuit.matches("(20|23|24|25|26|27|30|33|34)[0-9]{9}");}
 
-	// valida DNI (crear)
+	// valida DNI 
 	public static String validarDni(String mensaje) {
 		return validarDni(mensaje, "");}
 
-	// valida DNI con valor inicial (editar)
+	// valida DNI con valor inicial 
 	public static String validarDni(String mensaje, String valorInicial) {
 		String dni;
 		boolean valido = false;
@@ -169,17 +169,17 @@ public class Validaciones {
 		return dni;}
 
 	
-	// valida CUIT (crear)
+	// valida CUIT 
 	public static String validarCuit(String mensaje) {
 		return validarCuit(mensaje, "");}
 
-	// valida CUIT con valor inicial (editar)
+	// valida CUIT con valor inicial 
 	public static String validarCuit(String mensaje, String valorInicial) {
 		String cuit;
 		boolean valido = false;
 		do {
 			cuit = JOptionPane.showInputDialog(mensaje, valorInicial);
-			if (cuit == null) return null; // cancelar
+			if (cuit == null) return null; 
 			cuit = cuit.trim();
 			if (esCuitValido(cuit)) {
 				valido = true;

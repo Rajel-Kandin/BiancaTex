@@ -173,7 +173,6 @@ public class Producto {
 
 	
 	
-	
 
 	// eliminar producto
 	public static void eliminarProducto() {
