@@ -65,8 +65,8 @@ public class Admin extends Usuario {
 		            switch (seleccionProductos) {
 		                case 0: Producto.crearProducto(); break;
 		                case 1: Producto.buscarProductos(); break;
-		                case 2: Producto.editarProducto(); break;
-		                case 3: Producto.eliminarProducto(); break;
+		                /*case 2: Producto.editarProducto(); break;
+		                case 3: Producto.eliminarProducto(); break;*/
 		                case 4: Producto.verProductos();}
 		        } while (seleccionProductos != 5 && seleccionProductos != -1);}
 	        

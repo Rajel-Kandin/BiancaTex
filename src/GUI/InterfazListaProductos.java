@@ -1,6 +1,8 @@
 package GUI;
 
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 
 import javax.swing.JButton;
@@ -31,7 +33,7 @@ public class InterfazListaProductos extends JFrame {
 	public InterfazListaProductos() {
 		setTitle("BiancaTex - Lista de productos");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 800, 480);
+		setBounds(100, 100, 900, 480);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -63,7 +65,7 @@ public class InterfazListaProductos extends JFrame {
 		contentPane.add(lblBuscar);
 
 		inpBuscar = new JTextField();
-		inpBuscar.addActionListener(e -> cargarProductos()); // Enter también busca
+		inpBuscar.addActionListener(e -> cargarProductos()); 
 		inpBuscar.setBounds(330, 50, 200, 25);
 		contentPane.add(inpBuscar);
 
@@ -80,16 +82,43 @@ public class InterfazListaProductos extends JFrame {
 		btnLimpiar.setBounds(650, 50, 100, 25);
 		contentPane.add(btnLimpiar);
 
-		// tabla 
-		model = new DefaultTableModel(new String[]{"ID", "Nombre", "Precio", "Stock", "Categoría", "Talle"}, 0) {
+		// tabla
+		model = new DefaultTableModel(new String[]{"ID", "Nombre", "Precio", "Stock", "Categoría", "Talle", "", ""}, 0) {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;	}};
-				
+
 		tablaProductos = new JTable(model);
+		tablaProductos.setRowHeight(40);
+		tablaProductos.setShowHorizontalLines(true);
+
+		// botones editar y eliminar 
+		tablaProductos.getColumnModel().getColumn(6).setCellRenderer((t, v, s, f, r, c) -> new JButton("Editar"));
+		tablaProductos.getColumnModel().getColumn(7).setCellRenderer((t, v, s, f, r, c) -> new JButton("Eliminar"));
+
+		// clic en los botones
+		tablaProductos.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int fila = tablaProductos.rowAtPoint(e.getPoint());
+				int columna = tablaProductos.columnAtPoint(e.getPoint());
+				if (fila < 0) return;
+
+				String id = model.getValueAt(fila, 0).toString();
+
+				if (columna == 6) {
+					Producto.editarProducto(id);  
+					cargarProductos();
+				} else if (columna == 7) {
+					Producto.eliminarProducto(id);
+					cargarProductos();
+				}
+			}
+		});
+
 		JScrollPane scroll = new JScrollPane(tablaProductos);
-		scroll.setBounds(20, 90, 745, 290);
+		scroll.setBounds(20, 90, 845, 290);
 		contentPane.add(scroll);
 
 		lblMensaje = new JLabel("");
@@ -98,7 +127,7 @@ public class InterfazListaProductos extends JFrame {
 
 		JButton btnVolver = new JButton("Volver");
 		btnVolver.addActionListener(e -> dispose());
-		btnVolver.setBounds(665, 390, 100, 30);
+		btnVolver.setBounds(765, 390, 100, 30);
 		contentPane.add(btnVolver);
 
 		cargarProductos();}
@@ -108,12 +137,11 @@ public class InterfazListaProductos extends JFrame {
 		model.setRowCount(0);
 		String categoria = (String) comboCategoria.getSelectedItem();
 		String busqueda = inpBuscar.getText().trim();
-
 		LinkedList<Producto> productos = ProductoDAO.obtenerProductosFiltrados(categoria, busqueda);
 
 		for (Producto p : productos) {
 			model.addRow(new Object[]{p.getIdProducto(), p.getNombre(), "$" + p.getPrecio(),
-					p.getStockActual(), p.getCategoria(), p.getTalle()});
+					p.getStockActual(), p.getCategoria(), p.getTalle(), "Editar", "Eliminar"});
 		}
 
 		if (productos.isEmpty()) {
@@ -121,7 +149,4 @@ public class InterfazListaProductos extends JFrame {
 		} else {
 			lblMensaje.setText("Total: " + productos.size() + " productos");
 		}}
-	
-	
-	
 }

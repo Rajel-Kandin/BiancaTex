@@ -147,10 +147,7 @@ public class Producto {
 
 
 	// editar producto
-	public static void editarProducto() {
-	    String id = Validaciones.validarNumeros("Código del producto a editar:");
-	    if (id == null) return;
-
+	public static void editarProducto(String id) {
 	    Producto p = ProductoDAO.buscarProductoPorId(id);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún producto con ese código");
@@ -169,16 +166,10 @@ public class Producto {
 	    boolean editado = ProductoDAO.editarProducto(id, nuevoNombre, nuevoPrecio, nuevoStock, nuevaCategoria, nuevoTalle);
 	    if (editado) {
 	        JOptionPane.showMessageDialog(null, "Producto editado correctamente");}
-	    }
-
-	
-	
+	                             }
 
 	// eliminar producto
-	public static void eliminarProducto() {
-	    String id = Validaciones.validarNumeros("Código del producto a eliminar:");
-	    if (id == null) return;
-
+	public static void eliminarProducto(String id) {
 	    Producto p = ProductoDAO.buscarProductoPorId(id);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún producto con ese código");
@@ -192,7 +183,7 @@ public class Producto {
 	        boolean eliminado = ProductoDAO.desactivarProducto(id);
 	        if (eliminado) {
 	            JOptionPane.showMessageDialog(null, "Producto eliminado correctamente"); } }
-	}
+	                              }
 
 
 	// ver productos, filtros y búsqueda

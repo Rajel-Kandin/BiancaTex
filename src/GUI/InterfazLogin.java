@@ -3,7 +3,9 @@ package GUI;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Image;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -50,49 +52,52 @@ public class InterfazLogin extends JFrame {
 	public InterfazLogin() {
 		setTitle("BiancaTex - Login");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 320);
+		setBounds(100, 100, 450, 400);
 		setLocationRelativeTo(null);
 		setResizable(false);
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBackground(Color.WHITE);
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JLabel lblTitulo = new JLabel("BIANCATEX - LOGIN");
-		lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
-		lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTitulo.setBounds(0, 20, 434, 25);
-		contentPane.add(lblTitulo);
+		// logo
+		JLabel lblLogo = new JLabel();
+		ImageIcon icono = new ImageIcon(InterfazLogin.class.getResource("/logo.png"));
+		Image imagen = icono.getImage().getScaledInstance(160, 160, Image.SCALE_SMOOTH);
+		lblLogo.setIcon(new ImageIcon(imagen));
+		lblLogo.setBounds(137, 0, 160, 160);
+		contentPane.add(lblLogo);
 
 		JLabel lblEmail = new JLabel("Email:");
-		lblEmail.setBounds(107, 60, 220, 20);
+		lblEmail.setBounds(107, 145, 220, 20);
 		contentPane.add(lblEmail);
 
 		inpEmail = new JTextField();
-		inpEmail.setBounds(107, 82, 220, 28);
+		inpEmail.setBounds(107, 167, 220, 28);
 		contentPane.add(inpEmail);
 
 		JLabel lblPassword = new JLabel("Contraseña:");
-		lblPassword.setBounds(107, 120, 220, 20);
+		lblPassword.setBounds(107, 205, 220, 20);
 		contentPane.add(lblPassword);
 
 		inpPassword = new JPasswordField();
-		inpPassword.setBounds(107, 142, 220, 28);
+		inpPassword.setBounds(107, 227, 220, 28);
 		contentPane.add(inpPassword);
 
 		lblMensaje = new JLabel("");
 		lblMensaje.setForeground(Color.RED);
 		lblMensaje.setHorizontalAlignment(SwingConstants.CENTER);
-		lblMensaje.setBounds(0, 180, 434, 20);
+		lblMensaje.setBounds(0, 265, 434, 20);
 		contentPane.add(lblMensaje);
 
 		JButton btnLogin = new JButton("Ingresar");
-		btnLogin.setBounds(162, 210, 110, 32);
+		btnLogin.setBounds(162, 295, 110, 32);
 		btnLogin.addActionListener(e -> ingresar());
 		contentPane.add(btnLogin);
 
-		getRootPane().setDefaultButton(btnLogin); // Enter Ingresa
+		getRootPane().setDefaultButton(btnLogin);
 	}
 
 	private void ingresar() {
@@ -131,5 +136,5 @@ public class InterfazLogin extends JFrame {
 			new InterfazContador((Contador) logueado).setVisible(true);
 		}
 		dispose();}
-	
+
 }

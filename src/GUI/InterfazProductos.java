@@ -23,14 +23,14 @@ public class InterfazProductos extends JFrame {
 
 		setTitle("BiancaTex - Productos");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 420);
+		setBounds(100, 100, 450, 340);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		// Si  cierra, velve el menu
+		// Si cierra, vuelve el menu
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
@@ -58,24 +58,14 @@ public class InterfazProductos extends JFrame {
 		btnBuscar.setBounds(127, 137, 180, 32);
 		contentPane.add(btnBuscar);
 
-		JButton btnEditar = new JButton("Editar");
-		btnEditar.addActionListener(e -> Producto.editarProducto());
-		btnEditar.setBounds(127, 179, 180, 32);
-		contentPane.add(btnEditar);
-
-		JButton btnEliminar = new JButton("Eliminar");
-		btnEliminar.addActionListener(e -> Producto.eliminarProducto());
-		btnEliminar.setBounds(127, 221, 180, 32);
-		contentPane.add(btnEliminar);
-
 		JButton btnVer = new JButton("Ver productos");
 		btnVer.addActionListener(e -> new InterfazListaProductos().setVisible(true));
-		btnVer.setBounds(127, 263, 180, 32);
+		btnVer.setBounds(127, 179, 180, 32);
 		contentPane.add(btnVer);
 
 		JButton btnVolver = new JButton("Volver");
 		btnVolver.addActionListener(e -> dispose());
-		btnVolver.setBounds(127, 320, 180, 32);
+		btnVolver.setBounds(127, 236, 180, 32);
 		contentPane.add(btnVolver);
 	}
 }

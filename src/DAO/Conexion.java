@@ -9,15 +9,15 @@ import javax.swing.JOptionPane;
 public class Conexion {
 
 	//de manera remota
-	private static String URL ="jdbc:mysql://b6bb2p9uv4x0rs85ifrh-mysql.services.clever-cloud.com:3306/b6bb2p9uv4x0rs85ifrh";
+	/*private static String URL ="jdbc:mysql://b6bb2p9uv4x0rs85ifrh-mysql.services.clever-cloud.com:3306/b6bb2p9uv4x0rs85ifrh";
 	private static String USER = "uukognpjp4av0ws7";
-	private static String PASSWORD ="JwqcAwKvP7dFmidMoWR4";
+	private static String PASSWORD ="JwqcAwKvP7dFmidMoWR4";*/
 
 
 	//de manera local
-	/*private static String URL = "jdbc:mysql://localhost:3306/biancatex";
+	private static String URL = "jdbc:mysql://localhost:3306/biancatex";
 	private static String USER = "root";
-	private static String PASSWORD = "";*/
+	private static String PASSWORD = "";
 
 
 	private static Connection conect;
