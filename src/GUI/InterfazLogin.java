@@ -62,12 +62,19 @@ public class InterfazLogin extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		// logo
-		JLabel lblLogo = new JLabel();
+		// logo 
 		ImageIcon icono = new ImageIcon(InterfazLogin.class.getResource("/logo.png"));
-		Image imagen = icono.getImage().getScaledInstance(160, 160, Image.SCALE_SMOOTH);
-		lblLogo.setIcon(new ImageIcon(imagen));
-		lblLogo.setBounds(137, 0, 160, 160);
+		int anchoMax = 300;
+		int altoMax = 120;
+		double escala = Math.min((double) anchoMax / icono.getIconWidth(),
+				(double) altoMax / icono.getIconHeight());
+		int ancho = (int) (icono.getIconWidth() * escala);
+		int alto = (int) (icono.getIconHeight() * escala);
+		Image imagen = icono.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+
+		JLabel lblLogo = new JLabel(new ImageIcon(imagen));
+		lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogo.setBounds(0, 15, 434, altoMax);
 		contentPane.add(lblLogo);
 
 		JLabel lblEmail = new JLabel("Email:");

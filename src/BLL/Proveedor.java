@@ -20,48 +20,37 @@ public class Proveedor {
 		this.telefono = telefono;
 	}
 
-
 	public String getNombre() {
 		return nombre;
 	}
-
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
 
-
 	public String getCuit() {
 		return cuit;
 	}
-
 
 	public void setCuit(String cuit) {
 		this.cuit = cuit;
 	}
 
-
 	public String getDireccion() {
 		return direccion;
 	}
-
 
 	public void setDireccion(String direccion) {
 		this.direccion = direccion;
 	}
 
-
 	public String getTelefono() {
 		return telefono;
 	}
 
-
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
-
-
-
 
 	@Override
 	public String toString() {
@@ -88,31 +77,11 @@ public class Proveedor {
 		boolean creado = ProveedorDAO.crearProveedor(cuit, nombre, direccion.trim(), telefono);
 		if (creado) {
 			JOptionPane.showMessageDialog(null, "Proveedor creado correctamente");}
-	                                   }
+	}
 
 
-	// buscar proveedor
-	public static void buscarProveedor() {
-	    String cuit = Validaciones.validarCuit("CUIT del proveedor a buscar:");
-	    if (cuit == null) return;
-
-	    Proveedor p = ProveedorDAO.buscarProveedorPorCuit(cuit);
-	    if (p == null) {
-	        JOptionPane.showMessageDialog(null, "No se encontró ningún proveedor con ese CUIT");
-	        return; }
-
-	    JOptionPane.showMessageDialog(null,
-	        "Nombre: " + p.getNombre() +
-	        "\n CUIT: " + p.getCuit() +
-	        "\n Dirección: " + p.getDireccion() +
-	        "\n Teléfono: " + p.getTelefono());}
-
-
-	// editar proveedor
-	public static void editarProveedor() {
-		String cuit = Validaciones.validarCuit("CUIT del proveedor a editar:");
-		if (cuit == null) return;
-
+	// editar proveedor 
+	public static void editarProveedor(String cuit) {
 		Proveedor p = ProveedorDAO.buscarProveedorPorCuit(cuit);
 		if (p == null) {
 			JOptionPane.showMessageDialog(null, "No se encontró ningún proveedor con ese CUIT");
@@ -127,14 +96,11 @@ public class Proveedor {
 		if (nuevoTelefono == null) return;
 		boolean editado = ProveedorDAO.editarProveedor(cuit, nuevoNombre, nuevaDireccion.trim(), nuevoTelefono);
 		if (editado) {JOptionPane.showMessageDialog(null, "Proveedor editado correctamente");}
-	                                   }
+	}
 
 	
-	// eliminar proveedor
-	public static void eliminarProveedor() {
-	    String cuit = Validaciones.validarCuit("CUIT del proveedor a eliminar:");
-		if (cuit == null) return;
-
+	// eliminar proveedor 
+	public static void eliminarProveedor(String cuit) {
 	    Proveedor p = ProveedorDAO.buscarProveedorPorCuit(cuit);
 	    if (p == null) {
 	        JOptionPane.showMessageDialog(null, "No se encontró ningún proveedor con ese CUIT");
@@ -149,19 +115,5 @@ public class Proveedor {
 	        if (eliminado) {
 	            JOptionPane.showMessageDialog(null, "Proveedor eliminado correctamente");
 	        }}
-	                    }
-
-
-	// ver proveedores
-	public static void verProveedores() {
-	    String lista = ProveedorDAO.obtenerListaProveedores();
-	    if (lista.isEmpty()) {
-	        JOptionPane.showMessageDialog(null, "No hay proveedores cargados");
-	        return; }
-	    JOptionPane.showMessageDialog(null, lista, "Proveedores", JOptionPane.PLAIN_MESSAGE);
-                }
-	
-	
-	
-	
+	}
 }

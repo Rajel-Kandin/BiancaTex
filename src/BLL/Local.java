@@ -1,116 +1,89 @@
 package BLL;
 
-import java.util.LinkedList;
-
 import javax.swing.JOptionPane;
 
 import DAO.LocalDAO;
-import repository.Validaciones;
 
 public class Local {
 
-    private int IdLocal;
-    private String direccion;
+	private int idLocal;
+	private String direccion;
 
-    public Local(int idLocal, String direccion) {
-        super();
-        IdLocal = idLocal;
-        this.direccion = direccion;
-    }
+	public Local(int idLocal, String direccion) {
+		this.idLocal = idLocal;
+		this.direccion = direccion;
+	}
 
-    public int getIdLocal() {
-        return IdLocal;
-    }
+	public int getIdLocal() {
+		return idLocal;
+	}
 
-    public void setIdLocal(int idLocal) {
-        IdLocal = idLocal;
-    }
+	public void setIdLocal(int idLocal) {
+		this.idLocal = idLocal;
+	}
 
-    public String getDireccion() {
-        return direccion;
-    }
+	public String getDireccion() {
+		return direccion;
+	}
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
 
-    @Override
-    public String toString() {
-        return "Local [IdLocal=" + IdLocal + ", direccion=" + direccion + "]";
-    }
+	@Override
+	public String toString() {
+		return "Local [idLocal=" + idLocal + ", direccion=" + direccion + "]";
+	}
 
-    //crear
-    public static void crearLocal() {
-        String direccion = JOptionPane.showInputDialog("Ingrese la dirección del local:");
-        if (direccion == null || direccion.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Operación cancelada.");
-            return; }
-        boolean exito = LocalDAO.crearLocal(direccion);
-        if (exito) {
-            JOptionPane.showMessageDialog(null, "Local creado correctamente.");
-        } else {
-            JOptionPane.showMessageDialog(null, "Error al crear el local."); }
-    }
 
-    public static void buscarLocal() {
-        Integer idLocal = Validaciones.validarEntero("Ingrese el ID del local a buscar:");
-        if (idLocal == null) {
-            return;}
-        Local local = LocalDAO.buscarLocalPorId(idLocal);
-        if (local != null) {
-            String info = "ID: " + local.getIdLocal() + "\n";
-            info += "Dirección: " + local.getDireccion();
-            JOptionPane.showMessageDialog(null, info);
-        } else {
-            JOptionPane.showMessageDialog(null, "No se encontró el local."); }
-    }
+	// crear local
+	public static void crearLocal() {
+		String direccion = JOptionPane.showInputDialog("Dirección del nuevo local:");
+		if (direccion == null) return;
+		if (direccion.trim().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "La dirección es obligatoria");
+			return;}
 
-    //editar
-    public static void editarLocal() {
-        Integer idLocal = Validaciones.validarEntero("Ingrese el ID del local a editar:");
-        if (idLocal == null) {
-            return; }
-        Local local = LocalDAO.buscarLocalPorId(idLocal);
-        if (local == null) {
-            JOptionPane.showMessageDialog(null, "No se encontró el local.");
-            return;}
-        String nuevaDireccion = JOptionPane.showInputDialog("Nueva dirección:", local.getDireccion());
-        if (nuevaDireccion == null || nuevaDireccion.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Operación cancelada.");
-            return; }
-        local.setDireccion(nuevaDireccion);
-        boolean exito = LocalDAO.editarLocal(local);
-        if (exito) {
-            JOptionPane.showMessageDialog(null, "Local editado correctamente.");
-        } else {
-            JOptionPane.showMessageDialog(null, "Error al editar el local."); }
-    }
+		boolean creado = LocalDAO.crearLocal(direccion.trim());
+		if (creado) {
+			JOptionPane.showMessageDialog(null, "Local creado correctamente");}
+	}
 
-    
-    //eliminar 
-    public static void eliminarLocal() {
-        Integer idLocal = Validaciones.validarEntero("Ingrese el ID del local a eliminar:");
-        if (idLocal == null) {
-            return;
-        }
-        boolean exito = LocalDAO.desactivarLocal(idLocal);
-        if (exito) {
-            JOptionPane.showMessageDialog(null, "Local eliminado correctamente.");
-        } else {
-            JOptionPane.showMessageDialog(null, "Error al eliminar el local."); }
-    }
 
-    
-    //ver
-    public static void verLocales() {
-        LinkedList<Local> locales = LocalDAO.obtenerLocales();
-        if (locales.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No hay locales cargados.");
-            return;  }
-        StringBuilder texto = new StringBuilder();
-        for (Local l : locales) {
-            texto.append("ID: " + l.getIdLocal() + " - Dirección: " + l.getDireccion() + "\n"); }
-        JOptionPane.showMessageDialog(null, texto.toString());
-                                   }
-	
+	// editar local
+	public static void editarLocal(int idLocal) {
+		Local l = LocalDAO.buscarLocalPorId(idLocal);
+		if (l == null) {
+			JOptionPane.showMessageDialog(null, "No se encontró ningún local con ese ID");
+			return;}
+
+		String nuevaDireccion = JOptionPane.showInputDialog("Dirección:", l.getDireccion());
+		if (nuevaDireccion == null) return;
+		if (nuevaDireccion.trim().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "La dirección es obligatoria");
+			return;}
+
+		l.setDireccion(nuevaDireccion.trim());
+		boolean editado = LocalDAO.editarLocal(l);
+		if (editado) {
+			JOptionPane.showMessageDialog(null, "Local editado correctamente");}
+	}
+
+
+	// eliminar local 
+	public static void eliminarLocal(int idLocal) {
+		Local l = LocalDAO.buscarLocalPorId(idLocal);
+		if (l == null) {
+			JOptionPane.showMessageDialog(null, "No se encontró ningún local con ese ID");
+			return;}
+
+		int confirmacion = JOptionPane.showConfirmDialog(null,
+				"¿Seguro que querés eliminar el local de " + l.getDireccion() + "?",
+				"Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+
+		if (confirmacion == JOptionPane.YES_OPTION) {
+			boolean eliminado = LocalDAO.desactivarLocal(idLocal);
+			if (eliminado) {
+				JOptionPane.showMessageDialog(null, "Local eliminado correctamente");}}
+	}
 }

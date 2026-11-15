@@ -60,11 +60,14 @@ public class InterfazVentas extends JFrame {
 		contentPane.add(btnBuscar);
 
 		JButton btnVerVentas = new JButton("Ver ventas");
-		btnVerVentas.addActionListener(e -> Venta.verVentas());
+		btnVerVentas.addActionListener(e -> {
+			new InterfazListaVentas(this).setVisible(true);
+			setVisible(false);
+		});
 		btnVerVentas.setBounds(127, 179, 180, 32);
 		contentPane.add(btnVerVentas);
 
-		// limita al admin eliminar 
+		// solo admin tiene el eliminar
 		if (usuario instanceof Admin) {
 			JButton btnEliminar = new JButton("Eliminar");
 			btnEliminar.addActionListener(e -> Venta.eliminarVenta());

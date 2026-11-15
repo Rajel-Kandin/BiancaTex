@@ -159,5 +159,6 @@ public class ProveedorDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return proveedores;
-    }}
+        return proveedores; }
+    
+}

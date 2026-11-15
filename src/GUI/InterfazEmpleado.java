@@ -16,10 +16,8 @@ public class InterfazEmpleado extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private Empleado empleado;
 
 	public InterfazEmpleado(Empleado empleado) {
-		this.empleado = empleado;
 
 		setTitle("BiancaTex - Empleado");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -42,15 +40,17 @@ public class InterfazEmpleado extends JFrame {
 
 		JButton btnVentas = new JButton("Sección ventas");
 		btnVentas.addActionListener(e -> {
-			InterfazVentas ventas = new InterfazVentas(empleado, this);
-			ventas.setVisible(true);
-			setVisible(false); 
+			new InterfazVentas(empleado, this).setVisible(true);
+			setVisible(false);
 		});
 		btnVentas.setBounds(127, 95, 180, 32);
 		contentPane.add(btnVentas);
 
-		JButton btnProductos = new JButton("Ver productos");
-		btnProductos.addActionListener(e -> new InterfazListaProductos().setVisible(true));
+		JButton btnProductos = new JButton("Gestionar productos");
+		btnProductos.addActionListener(e -> {
+			new InterfazListaProductos(this).setVisible(true);
+			setVisible(false);
+		});
 		btnProductos.setBounds(127, 137, 180, 32);
 		contentPane.add(btnProductos);
 
@@ -61,13 +61,10 @@ public class InterfazEmpleado extends JFrame {
 
 		JButton btnCerrarSesion = new JButton("Cerrar sesión");
 		btnCerrarSesion.addActionListener(e -> {
-			InterfazLogin login = new InterfazLogin();
-			login.setVisible(true);
+			new InterfazLogin().setVisible(true);
 			dispose();
 		});
 		btnCerrarSesion.setBounds(127, 241, 180, 32);
 		contentPane.add(btnCerrarSesion);
-	
 	}
-	
 }

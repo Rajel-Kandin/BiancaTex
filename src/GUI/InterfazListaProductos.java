@@ -3,6 +3,8 @@ package GUI;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 
 import javax.swing.JButton;
@@ -30,7 +32,7 @@ public class InterfazListaProductos extends JFrame {
 	private JTextField inpBuscar;
 	private JLabel lblMensaje;
 
-	public InterfazListaProductos() {
+	public InterfazListaProductos(JFrame anterior) {
 		setTitle("BiancaTex - Lista de productos");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 900, 480);
@@ -39,6 +41,14 @@ public class InterfazListaProductos extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+
+		// Si cierra, vuelve al menu
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				anterior.setVisible(true);
+			}
+		});
 
 		JLabel lblTitulo = new JLabel("Productos");
 		lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
@@ -71,7 +81,7 @@ public class InterfazListaProductos extends JFrame {
 
 		JButton btnBuscar = new JButton("Buscar");
 		btnBuscar.addActionListener(e -> cargarProductos());
-		btnBuscar.setBounds(540, 50, 100, 25);
+		btnBuscar.setBounds(540, 50, 90, 25);
 		contentPane.add(btnBuscar);
 
 		JButton btnLimpiar = new JButton("Limpiar");
@@ -79,8 +89,16 @@ public class InterfazListaProductos extends JFrame {
 			inpBuscar.setText("");
 			comboCategoria.setSelectedIndex(0);
 		});
-		btnLimpiar.setBounds(650, 50, 100, 25);
+		btnLimpiar.setBounds(640, 50, 90, 25);
 		contentPane.add(btnLimpiar);
+
+		JButton btnCrear = new JButton("Crear producto");
+		btnCrear.addActionListener(e -> {
+			Producto.crearProducto();
+			cargarProductos();
+		});
+		btnCrear.setBounds(740, 50, 125, 25);
+		contentPane.add(btnCrear);
 
 		// tabla
 		model = new DefaultTableModel(new String[]{"ID", "Nombre", "Precio", "Stock", "Categoría", "Talle", "", ""}, 0) {
@@ -93,11 +111,11 @@ public class InterfazListaProductos extends JFrame {
 		tablaProductos.setRowHeight(40);
 		tablaProductos.setShowHorizontalLines(true);
 
-		// botones editar y eliminar 
+		// botones 
 		tablaProductos.getColumnModel().getColumn(6).setCellRenderer((t, v, s, f, r, c) -> new JButton("Editar"));
 		tablaProductos.getColumnModel().getColumn(7).setCellRenderer((t, v, s, f, r, c) -> new JButton("Eliminar"));
 
-		// clic en los botones
+		// clic 
 		tablaProductos.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -131,8 +149,9 @@ public class InterfazListaProductos extends JFrame {
 		contentPane.add(btnVolver);
 
 		cargarProductos();}
+	
 
-	// carga la tabla segun la categoria y el nombre elegidos
+	// carga la tabla 
 	private void cargarProductos() {
 		model.setRowCount(0);
 		String categoria = (String) comboCategoria.getSelectedItem();

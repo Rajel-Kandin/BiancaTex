@@ -1,7 +1,6 @@
 package GUI;
 
 import java.awt.Font;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,38 +42,37 @@ public class InterfazAdmin extends JFrame {
 		
 		JButton btnUsuarios = new JButton("Gestionar usuarios");
 		btnUsuarios.addActionListener(e -> {
-			new InterfazUsuarios(admin, this).setVisible(true);
+			new InterfazListaUsuarios(admin, this).setVisible(true);
 			setVisible(false);
 		});
 		btnUsuarios.setBounds(40, 95, 200, 32);
 		contentPane.add(btnUsuarios);
-
-		JButton btnProductos = new JButton("Gestionar productos");
-		btnProductos.addActionListener(e -> {
-			new InterfazProductos(admin, this).setVisible(true);
-			setVisible(false);
-		});
-		btnProductos.setBounds(264, 95, 200, 32);
-		contentPane.add(btnProductos);
-
-		// fila 2
-		JButton btnProveedores = new JButton("Gestionar proveedores");
-		btnProveedores.addActionListener(e -> {
-			new InterfazProveedores(admin, this).setVisible(true);
-			setVisible(false);
-		});
-		btnProveedores.setBounds(40, 137, 200, 32);
-		contentPane.add(btnProveedores);
 
 		JButton btnLocales = new JButton("Gestionar locales");
 		btnLocales.addActionListener(e -> {
 			new InterfazLocales(admin, this).setVisible(true);
 			setVisible(false);
 		});
-		btnLocales.setBounds(264, 137, 200, 32);
+		btnLocales.setBounds(264, 95, 200, 32);
 		contentPane.add(btnLocales);
 
-	
+		JButton btnProductos = new JButton("Gestionar productos");
+		btnProductos.addActionListener(e -> {
+			new InterfazListaProductos(this).setVisible(true);
+			setVisible(false);
+		});
+		btnProductos.setBounds(40, 137, 200, 32);
+		contentPane.add(btnProductos);
+
+		JButton btnProveedores = new JButton("Gestionar proveedores");
+		btnProveedores.addActionListener(e -> {
+			new InterfazListaProveedores(this).setVisible(true);
+			setVisible(false);
+		});
+		btnProveedores.setBounds(264, 137, 200, 32);
+		contentPane.add(btnProveedores);
+
+		
 		JButton btnCompras = new JButton("Sección compras");
 		btnCompras.addActionListener(e -> {
 			new InterfazCompras(admin, this).setVisible(true);
@@ -108,16 +106,22 @@ public class InterfazAdmin extends JFrame {
 		
 		JButton btnTickets = new JButton("Ver tickets");
 		btnTickets.addActionListener(e -> new InterfazTickets().setVisible(true));
-		btnTickets.setBounds(152, 263, 200, 32);
+		btnTickets.setBounds(40, 263, 200, 32);
 		contentPane.add(btnTickets);
 
+		JButton btnReportes = new JButton("Reportes");
+		btnReportes.addActionListener(e -> new InterfazReportes().setVisible(true));
+		btnReportes.setBounds(264, 263, 200, 32);
+		contentPane.add(btnReportes);
+
+		
 		JButton btnCerrarSesion = new JButton("Cerrar sesión");
 		btnCerrarSesion.addActionListener(e -> {
 			InterfazLogin login = new InterfazLogin();
 			login.setVisible(true);
 			dispose();
 		});
-		btnCerrarSesion.setBounds(152, 320, 200, 32);
+		btnCerrarSesion.setBounds(152, 315, 200, 32);
 		contentPane.add(btnCerrarSesion);
 	}
 }

@@ -8,6 +8,10 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.util.LinkedList;
+
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 import BLL.DetalleCompra;
 import BLL.Producto;
 
@@ -285,6 +289,33 @@ public class CompraDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();}
 		return factura;}
+	
+	
+	// Carga compras en interfaz
+	public static void cargarTablaCompras(DefaultTableModel modelo) {
+	    modelo.setRowCount(0);
+	    String sql = "SELECT c.id_compra, c.fecha, c.fk_cuit, c.total, u.nombre "
+	               + "FROM compra c "
+	               + "JOIN usuario u ON u.id_usuario = c.fk_usuario "
+	               + "ORDER BY c.fecha DESC";
+	    try {
+	        Connection con = Conexion.getInstance().getConnection();
+	        PreparedStatement ps = con.prepareStatement(sql);
+	        ResultSet rs = ps.executeQuery();
+	        while (rs.next()) {
+	            modelo.addRow(new Object[] {
+	                rs.getInt("id_compra"),
+	                rs.getString("fecha"),
+	                rs.getString("fk_cuit"),
+	                "$" + String.format("%.2f", rs.getDouble("total")),
+	                rs.getString("nombre")
+	            });
+	       }
+	        rs.close();
+	        ps.close();
+	    } catch (Exception e) {
+	        JOptionPane.showMessageDialog(null, "Error al cargar las compras: " + e.getMessage());}}
+	
 
 
 }

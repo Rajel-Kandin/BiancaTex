@@ -11,6 +11,9 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.LinkedList;
 
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 import BLL.DetalleVenta;
 
 public class VentaDAO {
@@ -91,6 +94,27 @@ public class VentaDAO {
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();}}}
+    
+ // trae el ticket d venta
+    public static String obtenerTicket(int idVenta) {
+        String ticket = null;
+        try {
+            Connection con = Conexion.getInstance().getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT ticket FROM venta WHERE id_venta = ?");
+            ps.setInt(1, idVenta);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                byte[] datos = rs.getBytes("ticket");
+                if (datos != null) {
+                    ticket = new String(datos);
+                }
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace(); }
+        return ticket; }
 
 
  // muestra  la compra de una venta con toda la info (datos, productos y totales)
@@ -281,6 +305,33 @@ public class VentaDAO {
             stmt.close();
         } catch (Exception e) {
             e.printStackTrace(); } }
+    
+    
+ // Carga ventas para interfaz
+    public static void cargarTablaVentas(DefaultTableModel modelo) {
+        modelo.setRowCount(0);
+        String sql = "SELECT v.id_venta, v.fecha, v.subTotal, v.descuento, v.total, u.nombre "
+                   + "FROM venta v "
+                   + "JOIN usuario u ON u.id_usuario = v.fk_usuario "
+                   + "ORDER BY v.fecha DESC";
+        try {
+            Connection con = Conexion.getInstance().getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                modelo.addRow(new Object[] {
+                    rs.getInt("id_venta"),
+                    rs.getString("fecha"),
+                    "$" + String.format("%.2f", rs.getDouble("subTotal")),
+                    rs.getDouble("descuento") + "%",
+                    "$" + String.format("%.2f", rs.getDouble("total")),
+                    rs.getString("nombre")
+                });
+            }
+            rs.close();
+            ps.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al cargar las ventas: " + e.getMessage());  } }
 
 
 }

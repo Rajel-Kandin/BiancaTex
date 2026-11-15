@@ -246,14 +246,14 @@ public class Compra extends Movimiento {
 			JOptionPane.showMessageDialog(null, "No se encontró ninguna compra con ese número");
 			return;}
 
-		// en lado izquierdo: muestra datos de la compra 
+		// en lado izquierdo, muestra datos de la compra 
 		JTextArea txtInfo = new JTextArea(texto.replace(" | ", "\n"));
 		txtInfo.setEditable(false);
 		txtInfo.setLineWrap(true);
 		txtInfo.setWrapStyleWord(true);
 		JScrollPane scroll = new JScrollPane(txtInfo);
 
-		// del lado derecho:  esta la foto 
+		// del lado derecho,  esta la foto 
 		JLabel lblFactura = new JLabel();
 		lblFactura.setHorizontalAlignment(JLabel.CENTER);
 		mostrarImagen(lblFactura, CompraDAO.obtenerFactura(idCompra));

@@ -45,11 +45,12 @@ public class Admin extends Usuario {
 
 	            switch (seleccionUsuarios) {
 	                case 0: crearUsuario(); break;
-	                case 1: buscarUsuario(); break;
-	                case 2: editarUsuario(); break;
-	                case 3: activarUsuario(); break;
-	                case 4: desactivarUsuario(); break;
-	                case 5: verUsuarios(); break; }
+	               // case 1: buscarUsuario(); break;
+	               //case 2: editarUsuario(); break;
+	               //case 3: activarUsuario(); break;
+	               //case 4: desactivarUsuario(); break;
+	               //case 5: verUsuarios(); break;
+	                }
 	        } while (seleccionUsuarios != 6  && seleccionUsuarios != -1);}
 	    
 	        
@@ -82,10 +83,11 @@ public class Admin extends Usuario {
 
 			            switch (seleccionProveedores) {
 			                case 0: Proveedor.crearProveedor(); break;
-			                case 1: Proveedor.buscarProveedor(); break;
-			                case 2: Proveedor.editarProveedor(); break;
-			                case 3: Proveedor.eliminarProveedor(); break;
-			                case 4: Proveedor.verProveedores();break; }
+			               // case 1: Proveedor.buscarProveedor(); break;
+			               // case 2: Proveedor.editarProveedor(); break;
+			               // case 3: Proveedor.eliminarProveedor(); break;
+			               //case 4: Proveedor.verProveedores();break; 
+			                }
 			        } while (seleccionProveedores != 5 && seleccionProveedores != -1);}
 	        
 	        
@@ -98,11 +100,12 @@ public class Admin extends Usuario {
 		                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
 		                    null, opcionesUsuarios, opcionesUsuarios[0]);
 		            switch (seleccionUsuarios) {
-		                case 0: Local.crearLocal(); break;
-		                case 1: Local.buscarLocal(); break;
-		                case 2: Local.editarLocal(); break;
-		                case 3: Local.eliminarLocal(); break;
-		                case 4: Local.verLocales();break;}
+		               // case 0: Local.crearLocal(); break;
+		               // case 1: Local.buscarLocal(); break;
+		              //  case 2: Local.editarLocal(); break;
+		               // case 3: Local.eliminarLocal(); break;
+		               // case 4: Local.verLocales();break;
+		            }
 		        } while (seleccionUsuarios != 5  && seleccionUsuarios != -1);}
 	        
 	        
@@ -149,7 +152,7 @@ public class Admin extends Usuario {
 			                0, 0, null, opciones, opciones[0]);
 
 			        switch (elegido) {
-			            case 0: CuentaCorriente.verCuentaCorriente();break;
+			           // case 0: CuentaCorriente.verCuentaCorriente();break;
 			            case 1: CuentaCorriente.cargarSaldoInicial(this);  break;
 			            case 2: CuentaCorriente.crearIngreso(this); break;
 			            case 3:  CuentaCorriente.crearEgreso(this); break;

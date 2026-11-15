@@ -1,19 +1,14 @@
 package BLL;
 import java.time.LocalDate;
 
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import DAO.CuentaCorrienteDAO;
 import repository.Validaciones;
 
 public class CuentaCorriente {
 
-
-
-
-	// cargar saldo inicial (solo si la cuenta está vacía)
+	// cargar saldo inicial 
 	public static void cargarSaldoInicial(Usuario usuario) {
 	    if (CuentaCorrienteDAO.existenMovimientos()) {
 	        JOptionPane.showMessageDialog(null, "Ya hay un saldo  cargado. El saldo inicial solo se carga una vez.");
@@ -36,43 +31,7 @@ public class CuentaCorriente {
 	    }}
 
 
-	// ver movimientos, filtros y el saldo actual
-	public static void verCuentaCorriente() {
-	    String[] filtros = {"Todos", "Ventas", "Compras", "Ingresos", "Egresos"};
-	    String filtro = "Todos";
-	    boolean seguir = true;
-
-	    while (seguir) {
-	        String lista = CuentaCorrienteDAO.obtenerListaMovimientos(filtro);
-
-	        if (lista.isEmpty()) {
-	            if (filtro.equals("Todos")) {
-	                JOptionPane.showMessageDialog(null, "No hay movimientos cargados");
-	                return; }
-	            lista = "No hay movimientos de este tipo."; }
-
-	        double saldo = CuentaCorrienteDAO.obtenerSaldo();
-	        lista += "\n\nSALDO ACTUAL: $" + String.format("%.2f", saldo);
-
-	        JComboBox<String> combo = new JComboBox<>(filtros);
-	        combo.setSelectedItem(filtro);
-
-	        // cambio de filtro abre y cierra 
-	        combo.addActionListener(e -> SwingUtilities.getWindowAncestor(combo).dispose());
-
-	        Object[] mensaje = {"Filtrar por:", combo, "\n" + lista};
-
-	        JOptionPane.showMessageDialog(null, mensaje, "Cuenta corriente - " + filtro, JOptionPane.PLAIN_MESSAGE);
-
-	        String elegido = (String) combo.getSelectedItem();
-	        if (elegido.equals(filtro)) {
-	            seguir = false;   
-	        } else {
-	            filtro = elegido;} }
-	                                                     }
-	
-	
-	// crear ingreso manual (suma al saldo)
+	// crear ingreso manual 
 	public static void crearIngreso(Usuario usuario) {
 	    Double monto = Validaciones.validarDouble("Monto del ingreso:");
 	    if (monto == null) return;
@@ -99,10 +58,9 @@ public class CuentaCorriente {
 	    } else {
 	        JOptionPane.showMessageDialog(null, "Error al registrar el ingreso");
 	    }}
-	
 
 
-	// crear egreso manual (resta al saldo)
+	// crear egreso manual 
 	public static void crearEgreso(Usuario usuario) {
 	    Double monto = Validaciones.validarDouble("Monto del egreso:");
 	    if (monto == null) return;
@@ -122,8 +80,7 @@ public class CuentaCorriente {
 	            "Crear egreso", JOptionPane.YES_NO_OPTION);
 	    if (confirmacion != JOptionPane.YES_OPTION) return;
 
-	    
-	    // monto negativo porque sale plata
+	    // monto negativo 
 	    boolean ok = CuentaCorrienteDAO.registrarMovimiento(LocalDate.now(), -monto,
 	            "Egreso: " + descripcion.trim(), usuario.getIdUsuario(), null, null);
 	    if (ok) {
@@ -133,7 +90,6 @@ public class CuentaCorriente {
 	    }}
 
 
-	
 	// eliminar un ingreso o egreso manual
 	public static void eliminarMovimientoManual() {
 	    String lista = CuentaCorrienteDAO.obtenerListaManuales();
@@ -155,10 +111,4 @@ public class CuentaCorriente {
 	    } else {
 	        JOptionPane.showMessageDialog(null, "No existe un ingreso/egreso manual con ese número");
 	    }}
-
-	
-	
-	
-
-
 }

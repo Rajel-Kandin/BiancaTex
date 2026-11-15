@@ -9,12 +9,16 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import DAO.ProductoDAO;
 import DAO.VentaDAO;
 import repository.Validaciones;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -246,18 +250,41 @@ public class Venta extends Movimiento {
                                }
     
     
-
-    
-    //busco las ventas
+ // buscar venta
     public static void buscarVenta() {
         Integer idVenta = Validaciones.validarEntero("Ingrese el ID de la venta a buscar:");
         if (idVenta == null) return;
-        String info = VentaDAO.obtenerVenta(idVenta);
 
+        String info = VentaDAO.obtenerVenta(idVenta);
         if (info == null) {
             JOptionPane.showMessageDialog(null, "No existe una venta con ese ID.");
-        } else {
-            JOptionPane.showMessageDialog(null, info);  }}
+            return;
+        }
+
+        // lado izquierdo, datos de la venta
+        JTextArea txtInfo = new JTextArea(info);
+        txtInfo.setEditable(false);
+        txtInfo.setLineWrap(true);
+        txtInfo.setWrapStyleWord(true);
+        JScrollPane scrollInfo = new JScrollPane(txtInfo);
+
+        // lado derecho, el ticket generado
+        String ticket = VentaDAO.obtenerTicket(idVenta);
+        if (ticket == null) {
+            ticket = "Esta venta no tiene ticket guardado.";
+        }
+        JTextArea txtTicket = new JTextArea(ticket);
+        txtTicket.setEditable(false);
+        txtTicket.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane scrollTicket = new JScrollPane(txtTicket);
+
+        // divide la pagina
+        JPanel panel = new JPanel(new GridLayout(1, 2, 10, 0));
+        panel.setPreferredSize(new Dimension(750, 400));
+        panel.add(scrollInfo);
+        panel.add(scrollTicket);
+
+        JOptionPane.showMessageDialog(null, panel, "Venta #" + idVenta, JOptionPane.PLAIN_MESSAGE); }
     
     
  

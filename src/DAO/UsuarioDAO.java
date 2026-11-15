@@ -1,10 +1,12 @@
 package DAO;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 import BLL.Admin;
 import BLL.Contador;
@@ -261,6 +263,38 @@ public class UsuarioDAO {
         } catch (SQLException e) {
             e.printStackTrace(); }
         return lista.toString();}
+    
    
+ // carga la tabla
+    public static void cargarTablaUsuarios(DefaultTableModel modelo, String busqueda) {
+        modelo.setRowCount(0);
+        String sql = "SELECT u.id_usuario, u.dni, u.nombre, u.email, t.tipo, u.activo "
+                   + "FROM usuario u "
+                   + "JOIN tipodeusuario t ON t.id_tipoDeUsuario = u.fk_tipoDeUsuario "
+                   + "WHERE u.nombre LIKE ? OR u.dni LIKE ? "
+                   + "ORDER BY u.nombre";
+        try {
+            Connection con = Conexion.getInstance().getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, "%" + busqueda + "%");
+            ps.setString(2, "%" + busqueda + "%");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                boolean activo = rs.getBoolean("activo");
+                modelo.addRow(new Object[] {
+                    rs.getInt("id_usuario"),
+                    rs.getString("dni"),
+                    rs.getString("nombre"),
+                    rs.getString("email"),
+                    rs.getString("tipo"),
+                    activo ? "Activo" : "Inactivo",
+                    "Editar",
+                    activo ? "Desactivar" : "Activar"
+                });
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace(); }}
 	
 }

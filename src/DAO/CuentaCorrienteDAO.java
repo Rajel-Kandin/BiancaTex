@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDate;
+
+import javax.swing.table.DefaultTableModel;
 
 public class CuentaCorrienteDAO {
 
@@ -32,6 +35,7 @@ public class CuentaCorrienteDAO {
                 stmt.setInt(6, idVenta); }
 
             stmt.executeUpdate();
+            stmt.close();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,6 +54,7 @@ public class CuentaCorrienteDAO {
             e.printStackTrace(); }
         return false; }
 
+
     // calcula saldo actual 
     public static double obtenerSaldo() {
         try {
@@ -61,71 +66,61 @@ public class CuentaCorrienteDAO {
         } catch (Exception e) {
             e.printStackTrace(); }
         return 0;}
-    
 
- // lista de movimientos de cc  con  filtros 
-    public static String obtenerListaMovimientos(String filtro) {
-        StringBuilder texto = new StringBuilder();
-        double saldo = 0;
-        double total = 0;
 
-        String sql = "SELECT * FROM cuentacorriente";
+    // carga la tabla
+    public static void cargarTablaMovimientos(DefaultTableModel modelo, String filtro) {
+        modelo.setRowCount(0);
+        String where = "";
         switch (filtro) {
-            case "Ventas":
-                sql += " WHERE fk_venta IS NOT NULL";
-                break;
-            case "Compras":
-                sql += " WHERE fk_compra IS NOT NULL";
-                break;
-            case "Ingresos":
-                sql += " WHERE fk_venta IS NULL AND fk_compra IS NULL AND monto > 0";
-                break;
-            case "Egresos":
-                sql += " WHERE fk_venta IS NULL AND fk_compra IS NULL AND monto < 0";
-                break;
+            case "Ventas":   where = "WHERE c.fk_venta IS NOT NULL "; break;
+            case "Compras":  where = "WHERE c.fk_compra IS NOT NULL "; break;
+            case "Ingresos": where = "WHERE c.fk_venta IS NULL AND c.fk_compra IS NULL AND c.monto > 0 "; break;
+            case "Egresos":  where = "WHERE c.fk_venta IS NULL AND c.fk_compra IS NULL AND c.monto < 0 "; break;
         }
-        sql += " ORDER BY id_movimiento";
-
+        String sql = "SELECT c.id_movimiento, c.fecha, c.monto, c.descripcion, c.fk_venta, c.fk_compra, u.nombre "
+                   + "FROM cuentacorriente c "
+                   + "LEFT JOIN usuario u ON u.id_usuario = c.fk_usuario "
+                   + where
+                   + "ORDER BY c.fecha DESC, c.id_movimiento DESC";
         try {
             Connection con = Conexion.getInstance().getConnection();
-            PreparedStatement stmt = con.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 double monto = rs.getDouble("monto");
-                saldo += monto;
-                total += monto;
+                String descripcion = rs.getString("descripcion");
 
                 String tipo;
                 if (rs.getObject("fk_venta") != null) {
                     tipo = "Venta #" + rs.getInt("fk_venta");
                 } else if (rs.getObject("fk_compra") != null) {
                     tipo = "Compra #" + rs.getInt("fk_compra");
+                } else if ("Saldo inicial".equals(descripcion)) {
+                    tipo = "Saldo inicial";
+                } else if (monto > 0) {
+                    tipo = "Ingreso";
                 } else {
-                    tipo = rs.getString("descripcion"); }
+                    tipo = "Egreso"; }
 
-                String montoTexto;
-                if (monto >= 0) {
-                    montoTexto = "+$" + String.format("%.2f", monto);
-                } else {
-                    montoTexto = "-$" + String.format("%.2f", -monto);}
+                String montoTexto = (monto >= 0 ? "+ $" : "- $") + String.format("%.2f", Math.abs(monto));
 
-                texto.append(rs.getDate("fecha") + "  |  " + tipo + "  |  " + montoTexto);
-                if (filtro.equals("Todos")) {
-                    texto.append("  |  Saldo: $" + String.format("%.2f", saldo)); }
-                texto.append("\n");}
+                modelo.addRow(new Object[] {
+                    rs.getInt("id_movimiento"),
+                    rs.getString("fecha"),
+                    tipo,
+                    descripcion,
+                    montoTexto,
+                    rs.getString("nombre")
+                });
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace(); }}
 
-            if (texto.length() > 0 && !filtro.equals("Todos")) {
-                texto.append("\n TOTAL " + filtro.toUpperCase() + ": $" + String.format("%.2f", Math.abs(total)));}
-        } catch (Exception e) {
-            e.printStackTrace();}
-        return texto.toString(); }
-    
-    
 
-    
-    
-    // muestra solo los ingresos y egresos manuales 
+    // muestra  los ingresos  egresos  
     public static String obtenerListaManuales() {
         StringBuilder texto = new StringBuilder();
         try {
@@ -149,8 +144,7 @@ public class CuentaCorrienteDAO {
             e.printStackTrace();  }
         return texto.toString();   }
 
-    
-    
+
     // elimina un movimiento manual 
     public static boolean eliminarMovimientoManual(int idMovimiento) {
         try {
@@ -163,6 +157,7 @@ public class CuentaCorrienteDAO {
         } catch (Exception e) {
             e.printStackTrace();
             return false; }}
+    
     
     
 }

@@ -57,16 +57,20 @@ public class InterfazCompras extends JFrame {
 		btnBuscar.addActionListener(e -> Compra.buscarCompra());
 		btnBuscar.setBounds(127, 137, 180, 32);
 		contentPane.add(btnBuscar);
+		
+		JButton btnVerCompras = new JButton("Ver compras");
+		btnVerCompras.addActionListener(e -> {
+			new InterfazListaCompras(this).setVisible(true);
+			setVisible(false);
+		});
+		btnVerCompras.setBounds(127, 221, 180, 32);
+		contentPane.add(btnVerCompras);
 
 		JButton btnEliminar = new JButton("Eliminar");
 		btnEliminar.addActionListener(e -> Compra.eliminarCompra());
 		btnEliminar.setBounds(127, 179, 180, 32);
 		contentPane.add(btnEliminar);
 
-		JButton btnVerCompras = new JButton("Ver compras");
-		btnVerCompras.addActionListener(e -> Compra.verCompras());
-		btnVerCompras.setBounds(127, 221, 180, 32);
-		contentPane.add(btnVerCompras);
 
 		JButton btnVolver = new JButton("Volver");
 		btnVolver.addActionListener(e -> dispose());

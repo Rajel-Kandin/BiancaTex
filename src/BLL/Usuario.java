@@ -125,7 +125,7 @@ public abstract class Usuario implements Menu {
 		boolean creado = UsuarioDAO.crearUsuario(dni, nombre, email, password, tipo, fkLocal);
 		if (creado) {
 			JOptionPane.showMessageDialog(null, "Usuario creado correctamente");}
-	                             }
+	}
 	
     
     private Integer seleccionarLocal() {
@@ -144,30 +144,8 @@ public abstract class Usuario implements Menu {
         return locales.get(seleccionado).getIdLocal(); }
     
 
-    // buscar usuario
-    public void buscarUsuario() {
-        Integer idUsuario = Validaciones.validarEntero("ID del usuario a buscar:");
-        if (idUsuario == null) return;
-
-        Usuario u = UsuarioDAO.buscarUsuarioPorId(idUsuario);
-        if (u == null) {
-            JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese ID");
-            return; }
-
-        JOptionPane.showMessageDialog(null,
-                "ID: " + u.getIdUsuario() +
-                "\nNombre: " + u.getNombre() +
-                "\nDNI: " + u.getDni() +
-                "\nEmail: " + u.getEmail() +
-                "\nTipo: " + u.getTipoTexto() +
-                "\nActivo: " + (u.getActivo() ? "Sí" : "No"));}
-    
-
-	// editar usuario
-	public void editarUsuario() {
-		Integer idUsuario = Validaciones.validarEntero("ID del usuario a editar:");
-		if (idUsuario == null) return;
-
+	// editar usuario 
+	public void editarUsuario(int idUsuario) {
 		Usuario u = UsuarioDAO.buscarUsuarioPorId(idUsuario);
 		if (u == null) {
 			JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese ID");
@@ -198,13 +176,10 @@ public abstract class Usuario implements Menu {
 		boolean editado = UsuarioDAO.editarUsuario(idUsuario, u.getDni(), nuevoNombre, nuevoEmail, nuevoTipo, nuevoFkLocal);
 		if (editado) {
 			JOptionPane.showMessageDialog(null, "Usuario editado correctamente");}
-	                                            }
+	}
 
-    // desactivar usuario
-    public void desactivarUsuario() {
-        Integer idUsuario = Validaciones.validarEntero("ID del usuario a desactivar:");
-        if (idUsuario == null) return;
-
+    // desactivar usuario 
+    public void desactivarUsuario(int idUsuario) {
         Usuario u = UsuarioDAO.buscarUsuarioPorId(idUsuario);
         if (u == null) {
             JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese ID");
@@ -215,11 +190,6 @@ public abstract class Usuario implements Menu {
             JOptionPane.showMessageDialog(null, "No podés desactivar tu propio usuario");
             return;}
 
-        // no se puede desactivar si ya esta desactivado
-        if (!u.getActivo()) {
-            JOptionPane.showMessageDialog(null, u.getNombre() + " ya está desactivado");
-            return; }
-
         int confirmacion = JOptionPane.showConfirmDialog(null,
                 "¿Seguro que querés desactivar a " + u.getNombre() + "?",
                 "Confirmar desactivación", JOptionPane.YES_NO_OPTION);
@@ -228,26 +198,13 @@ public abstract class Usuario implements Menu {
             boolean desactivado = UsuarioDAO.desactivarUsuario(u.getIdUsuario());
             if (desactivado) {
                 JOptionPane.showMessageDialog(null, "Usuario desactivado correctamente");  }}
-                                            }
+    }
 
     // activar usuario
-    public void activarUsuario() {
-        Integer idUsuario = Validaciones.validarEntero("ID del usuario a activar:");
-        if (idUsuario == null) return;
-
+    public void activarUsuario(int idUsuario) {
         Usuario u = UsuarioDAO.buscarUsuarioPorId(idUsuario);
         if (u == null) {
             JOptionPane.showMessageDialog(null, "No se encontró ningún usuario con ese ID");
-            return; }
-
-        // no puede activarse a sí mismo
-        if (u.getIdUsuario() == this.getIdUsuario()) {
-            JOptionPane.showMessageDialog(null, "No podés activar tu propio usuario");
-            return;}
-
-        // no se puede activar uno que ya está activo
-        if (u.getActivo()) {
-            JOptionPane.showMessageDialog(null, u.getNombre() + " ya está activo");
             return; }
 
         int confirmacion = JOptionPane.showConfirmDialog(null,
@@ -257,22 +214,9 @@ public abstract class Usuario implements Menu {
         if (confirmacion == JOptionPane.YES_OPTION) {
             boolean activado = UsuarioDAO.activarUsuario(u.getIdUsuario());
             if (activado) {
-                JOptionPane.showMessageDialog(null, "Usuario activado correctamente"); }  }}
-    
-
-    // ver usuarios
-    public void verUsuarios() {
-        String lista = UsuarioDAO.obtenerListaUsuarios();
-        if (lista.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No hay usuarios cargados");
-            return;}
-        JOptionPane.showMessageDialog(null, lista, "Usuarios", JOptionPane.PLAIN_MESSAGE);}
-    
-    
-}
-	
-	
-	
+                JOptionPane.showMessageDialog(null, "Usuario activado correctamente"); }  }
+    }
+}	
 	
 	
 	
